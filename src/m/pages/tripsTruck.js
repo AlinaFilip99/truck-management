@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import MenuBar from "../base/MenuBar";
 import { useParams } from "react-router-dom";
 import { Card } from "primereact/card";
 import tripService from "../../services/tripService";
@@ -12,6 +11,7 @@ import { Menu } from "primereact/menu";
 import { confirmDialog } from "primereact/confirmdialog";
 import styled from "styled-components";
 import EditTrip from "../journey/EditTip";
+import AppLayout from "../base/Layout";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -43,23 +43,18 @@ const TripsTruck = () => {
 
   const items = [
     {
-      label: "Options",
-      items: [
-        {
-          label: "Change start date",
-          icon: "pi pi-refresh",
-          command: () => {
-            onClick("displayEditTrip");
-          },
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-times",
-          command: () => {
-            confirmDelete();
-          },
-        },
-      ],
+      label: "Change start date",
+      icon: "pi pi-refresh",
+      command: () => {
+        onClick("displayEditTrip");
+      },
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-times",
+      command: () => {
+        confirmDelete();
+      },
     },
   ];
 
@@ -74,14 +69,12 @@ const TripsTruck = () => {
     });
   };
 
+  const reject = () => {};
+
   const accept = () => {
     tripService.deleteTrip(trip.tripId).then(() => {
       loadTrips();
     });
-  };
-
-  const reject = () => {
-    console.log("record not deleted");
   };
 
   useEffect(() => {
@@ -92,7 +85,6 @@ const TripsTruck = () => {
 
   const loadTrips = () => {
     tripService.getByTruckId(_userid).then((data) => {
-      console.log(data);
       setUserTrips(data);
     });
   };
@@ -181,8 +173,7 @@ const TripsTruck = () => {
   };
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <div
         style={{
           width: "76%",
@@ -265,7 +256,7 @@ const TripsTruck = () => {
         trip={trip}
         showAll={false}
       />
-    </>
+    </AppLayout>
   );
 };
 

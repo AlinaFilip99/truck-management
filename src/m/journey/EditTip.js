@@ -27,7 +27,6 @@ const EditTrip = ({
 
   useEffect(() => {
     if (trip) {
-      console.log(trip);
       setCountry(trip.country);
       setRegion(trip.region);
       setCity(trip.city);

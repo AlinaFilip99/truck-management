@@ -1,7 +1,6 @@
 import { Card } from "primereact/card";
 import React, { useEffect, useState, useRef } from "react";
 import clientService from "../../services/clientService";
-import MenuBar from "../base/MenuBar";
 import { DataTable } from "primereact/datatable";
 import { FilterMatchMode } from "primereact/api";
 import { Column } from "primereact/column";
@@ -12,6 +11,7 @@ import { Menu } from "primereact/menu";
 import { confirmDialog } from "primereact/confirmdialog";
 import AddUser from "../user/AddUser";
 import EditUser from "../user/EditUser";
+import AppLayout from "../base/Layout";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -46,31 +46,26 @@ const Home = () => {
 
   const items = [
     {
-      label: "Options",
-      items: [
-        {
-          label: "Details",
-          icon: "pi pi-check",
-          command: () => {
-            let url = "/truck-details/" + user.id;
-            window.location.hash = url;
-          },
-        },
-        {
-          label: "Edit",
-          icon: "pi pi-refresh",
-          command: () => {
-            onClick("displayEditUser");
-          },
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-times",
-          command: () => {
-            confirmDelete();
-          },
-        },
-      ],
+      label: "Details",
+      icon: "pi pi-check",
+      command: () => {
+        let url = "/truck-details/" + user.id;
+        window.location.hash = url;
+      },
+    },
+    {
+      label: "Edit",
+      icon: "pi pi-refresh",
+      command: () => {
+        onClick("displayEditUser");
+      },
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-times",
+      command: () => {
+        confirmDelete();
+      },
     },
   ];
 
@@ -93,9 +88,7 @@ const Home = () => {
     });
   };
 
-  const reject = () => {
-    console.log("record not deleted");
-  };
+  const reject = () => {};
 
   useEffect(() => {
     if (isLogged === "true") {
@@ -104,10 +97,12 @@ const Home = () => {
   }, [isLogged]);
 
   const load = () => {
-    clientService.getTruckAccounts().then((data) => {
-      console.log(data);
-      setTruckAccounts(data);
-    });
+    let userId = localStorage.getItem("CurrentUserId");
+    if (userId) {
+      clientService.getTruckAccounts(userId).then((data) => {
+        setTruckAccounts(data);
+      });
+    }
   };
 
   const onGlobalFilterChange = (e) => {
@@ -174,8 +169,7 @@ const Home = () => {
   };
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <div
         style={{
           width: "76%",
@@ -254,7 +248,7 @@ const Home = () => {
         reload={load}
         user={user}
       />
-    </>
+    </AppLayout>
   );
 };
 

@@ -60,7 +60,6 @@ const Footer = () => {
       icon: "pi pi-stop-circle",
       command: () => {
         var pageWallpapers = document.getElementById("root");
-        console.log(pageWallpapers);
 
         if (pageWallpapers.style.filter == "grayscale(100%)") {
           pageWallpapers.style.filter = "unset";

@@ -24,32 +24,32 @@ const MenuBar = (props) => {
     //     window.location.hash = "/home";
     //   },
     // },
-    {
-      label: "Login",
-      style: { display: props.isLogged === "true" ? "none" : "unset" },
-      //   icon: "pi pi-fw pi-pencil",
-      command: () => {
-        window.location.hash = "/login";
-      },
-    },
-    {
-      label: "Register",
-      style: { display: props.isLogged === "true" ? "none" : "unset" },
-      //   icon: "pi pi-fw pi-user",
-      command: () => {
-        window.location.hash = "/register";
-      },
-    },
-    {
-      label: "Logout",
-      style: { display: props.isLogged === "false" ? "none" : "unset" },
-      //   icon: "pi pi-fw pi-pencil",
-      command: () => {
-        localStorage.setItem("isLogged", "false");
-        localStorage.setItem("isAdmin", "false");
-        window.location.reload();
-      },
-    },
+    // {
+    //   label: "Login",
+    //   style: { display: props.isLogged === "true" ? "none" : "unset" },
+    //   //   icon: "pi pi-fw pi-pencil",
+    //   command: () => {
+    //     window.location.hash = "/login";
+    //   },
+    // },
+    // {
+    //   label: "Register",
+    //   style: { display: props.isLogged === "true" ? "none" : "unset" },
+    //   //   icon: "pi pi-fw pi-user",
+    //   command: () => {
+    //     window.location.hash = "/register";
+    //   },
+    // },
+    // {
+    //   label: "Logout",
+    //   style: { display: props.isLogged === "false" ? "none" : "unset" },
+    //   //   icon: "pi pi-fw pi-pencil",
+    //   command: () => {
+    //     localStorage.setItem("isLogged", "false");
+    //     localStorage.setItem("isAdmin", "false");
+    //     window.location.reload();
+    //   },
+    // },
     {
       label: "Trucks",
       style: {
@@ -93,15 +93,29 @@ const MenuBar = (props) => {
       },
     },
     {
-      label: "About",
+      label: "Statistics",
+      style: {
+        display:
+          props.isLogged === "false" ||
+          localStorage.getItem("isAdmin") === "false"
+            ? "none"
+            : "unset",
+      },
+      //   icon: "pi pi-fw pi-user",
       command: () => {
-        window.location.hash = "/about";
+        window.location.hash = "/statistics";
       },
     },
     {
       label: "Contact",
       command: () => {
         window.location.hash = "/contact";
+      },
+    },
+    {
+      label: "About",
+      command: () => {
+        window.location.hash = "/about";
       },
     },
   ];
@@ -121,6 +135,42 @@ const MenuBar = (props) => {
   );
   const end = (
     <>
+      <Button
+        className="p-button-text"
+        label="Login"
+        style={{
+          color: "black",
+          display: props.isLogged === "true" ? "none" : "unset",
+        }}
+        onClick={() => {
+          window.location.hash = "/login";
+        }}
+      />
+      <Button
+        className="p-button-text"
+        label="Register"
+        style={{
+          color: "black",
+          display: props.isLogged === "true" ? "none" : "unset",
+        }}
+        onClick={() => {
+          window.location.hash = "/register";
+        }}
+      />
+      <Button
+        className="p-button-text"
+        label="Logout"
+        style={{
+          color: "black",
+          display: props.isLogged === "false" ? "none" : "unset",
+        }}
+        onClick={() => {
+          localStorage.setItem("isLogged", "false");
+          localStorage.setItem("isAdmin", "false");
+          localStorage.removeItem("CurrentUserId");
+          window.location.reload();
+        }}
+      />
       <Button
         icon="pi pi-user"
         className="p-button-rounded p-button-plain p-button-text"

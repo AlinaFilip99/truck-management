@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import MenuBar from "../base/MenuBar";
 import { Card } from "primereact/card";
 import tripService from "../../services/tripService";
 import { DataTable } from "primereact/datatable";
@@ -13,6 +12,7 @@ import styled from "styled-components";
 import EditTrip from "../journey/EditTip";
 import AddTrip from "../journey/AddTrip";
 import clientService from "../../services/clientService";
+import AppLayout from "../base/Layout";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -44,23 +44,18 @@ const Trips = () => {
 
   const items = [
     {
-      label: "Options",
-      items: [
-        {
-          label: "Edit",
-          icon: "pi pi-refresh",
-          command: () => {
-            onClick("displayEditTrip");
-          },
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-times",
-          command: () => {
-            confirmDelete();
-          },
-        },
-      ],
+      label: "Edit",
+      icon: "pi pi-refresh",
+      command: () => {
+        onClick("displayEditTrip");
+      },
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-times",
+      command: () => {
+        confirmDelete();
+      },
     },
   ];
 
@@ -75,29 +70,31 @@ const Trips = () => {
     });
   };
 
+  const reject = () => {};
+
   const accept = () => {
     tripService.deleteTrip(trip.tripId).then(() => {
       loadTrips();
     });
   };
 
-  const reject = () => {
-    console.log("record not deleted");
-  };
-
   useEffect(() => {
-    clientService.getTruckAccounts().then((data) => {
-      console.log(data);
-      setTrucks(data);
-    });
-    loadTrips();
+    let userId = localStorage.getItem("CurrentUserId");
+    if (userId) {
+      clientService.getTruckAccounts(userId).then((data) => {
+        setTrucks(data);
+      });
+      loadTrips();
+    }
   }, []); // eslint-disable-line
 
   const loadTrips = () => {
-    tripService.getAll().then((data) => {
-      console.log(data);
-      setTrips(data);
-    });
+    let userId = localStorage.getItem("CurrentUserId");
+    if (userId) {
+      tripService.getAll(userId).then((data) => {
+        setTrips(data);
+      });
+    }
   };
 
   const onGlobalFilterChange = (e) => {
@@ -190,8 +187,7 @@ const Trips = () => {
   };
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <div
         style={{
           width: "76%",
@@ -285,7 +281,7 @@ const Trips = () => {
         users={trucks}
         showAll={true}
       />
-    </>
+    </AppLayout>
   );
 };
 

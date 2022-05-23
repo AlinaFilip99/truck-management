@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import MenuBar from "../base/MenuBar";
 import { useParams } from "react-router-dom";
 import clientService from "../../services/clientService";
 import { Card } from "primereact/card";
@@ -14,6 +13,7 @@ import { confirmDialog } from "primereact/confirmdialog";
 import styled from "styled-components";
 import AddTrip from "../journey/AddTrip";
 import EditTrip from "../journey/EditTip";
+import AppLayout from "../base/Layout";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -47,23 +47,18 @@ const TruckDetails = () => {
 
   const items = [
     {
-      label: "Options",
-      items: [
-        {
-          label: "Edit",
-          icon: "pi pi-refresh",
-          command: () => {
-            onClick("displayEditTrip");
-          },
-        },
-        {
-          label: "Delete",
-          icon: "pi pi-times",
-          command: () => {
-            confirmDelete();
-          },
-        },
-      ],
+      label: "Edit",
+      icon: "pi pi-refresh",
+      command: () => {
+        onClick("displayEditTrip");
+      },
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-times",
+      command: () => {
+        confirmDelete();
+      },
     },
   ];
 
@@ -78,25 +73,17 @@ const TruckDetails = () => {
     });
   };
 
+  const reject = () => {};
+
   const accept = () => {
     tripService.deleteTrip(trip.tripId).then(() => {
       loadTrips();
     });
-    // clientService.deleteUser(user.id).then((response) => {
-    //   if (response.succeeded) {
-    //     load();
-    //   }
-    // });
-  };
-
-  const reject = () => {
-    console.log("record not deleted");
   };
 
   useEffect(() => {
     if (_userid) {
       clientService.getById(_userid).then((data) => {
-        console.log(data);
         setUser(data);
       });
       loadTrips();
@@ -105,7 +92,6 @@ const TruckDetails = () => {
 
   const loadTrips = () => {
     tripService.getByTruckId(_userid).then((data) => {
-      console.log(data);
       setUserTrips(data);
     });
   };
@@ -200,8 +186,7 @@ const TruckDetails = () => {
   };
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <div
         style={{
           width: "76%",
@@ -384,7 +369,7 @@ const TruckDetails = () => {
         trip={trip}
         showAll={true}
       />
-    </>
+    </AppLayout>
   );
 };
 

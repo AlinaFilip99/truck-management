@@ -31,9 +31,9 @@ const AddUser = ({ visible, onHide, reload }) => {
         plateNumber: plateNumber,
         phoneNumber: phoneNumber,
         driversNumber: 0,
+        adminID: localStorage.getItem("CurrentUserId"),
       })
       .then((response) => {
-        console.log(response);
         if (response.succeeded) {
           setUserName("");
           setPlateNumber("");

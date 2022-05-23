@@ -3,8 +3,8 @@ import clientService from "../../services/clientService";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { confirmDialog } from "primereact/confirmdialog";
-import MenuBar from "../base/MenuBar";
 import EditUser from "../user/EditUser";
+import AppLayout from "../base/Layout";
 
 const Profile = () => {
   const [user, setUser] = useState();
@@ -25,9 +25,8 @@ const Profile = () => {
 
   const load = () => {
     let userEmail = localStorage.getItem("userEmail");
-    console.log(userEmail);
+
     clientService.getByEmail(userEmail).then((data) => {
-      console.log(data);
       setUser(data);
     });
   };
@@ -66,24 +65,21 @@ const Profile = () => {
     });
   };
 
+  const reject = () => {};
+
   const accept = () => {
     clientService.deleteUser(user.userId).then((response) => {
       if (response.succeeded) {
         localStorage.setItem("isLogged", "false");
         localStorage.setItem("isAdmin", "false");
+        localStorage.removeItem("CurrentUserId");
         window.location.hash = "/login";
       }
     });
   };
 
-  const reject = () => {
-    console.log("record not deleted");
-  };
-
   return (
-    <>
-      <MenuBar isLogged={isLogged} userId={user?.userId} />
-
+    <AppLayout userId={user?.userId}>
       <div
         style={{
           width: "76%",
@@ -197,7 +193,7 @@ const Profile = () => {
         user={user}
         isAdmin={isAdmin === "true"}
       />
-    </>
+    </AppLayout>
   );
 };
 

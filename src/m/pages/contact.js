@@ -1,12 +1,11 @@
 import React, { useState, useRef } from "react";
-import MenuBar from "../base/MenuBar";
-import Footer from "../base/Footer";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import axios from "axios";
+import AppLayout from "../base/Layout";
 
 const ContactPage = () => {
   const [name, setName] = useState("");
@@ -14,9 +13,6 @@ const ContactPage = () => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const toast = useRef(null);
-  const [isLogged, setIsLogged] = useState(
-    localStorage.getItem("isLogged") || "false"
-  );
 
   const sendContact = (e) => {
     e.preventDefault();
@@ -59,14 +55,13 @@ const ContactPage = () => {
   );
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <Toast ref={toast} />
       <div
         style={{
           textAlign: "-webkit-center",
           marginTop: "50px",
-          height: "calc(100vh - 64px - 58px)",
+          // height: "calc(100vh - 64px - 58px)",
         }}
       >
         <Card
@@ -118,28 +113,9 @@ const ContactPage = () => {
             />
             <label htmlFor="message">Message</label>
           </div>
-          {/* <span className="p-float-label" style={{ marginTop: "15px" }}>
-            <StyledPassword
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              header={header}
-              footer={footer}
-              toggleMask
-            />
-            <label htmlFor="password">Password</label>
-          </span>
-          <div style={{ marginTop: "15px" }}>
-            <Button
-              label="I have an account."
-              className="p-button-link"
-              onClick={() => (window.location.hash = "/login")}
-            />
-          </div> */}
         </Card>
       </div>
-      <Footer />
-    </>
+    </AppLayout>
   );
 };
 

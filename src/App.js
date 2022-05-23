@@ -7,6 +7,7 @@ import TruckDetails from "./m/pages/truckDetails";
 import Trips from "./m/pages/trips";
 import Profile from "./m/pages/profile";
 import TripsTruck from "./m/pages/tripsTruck";
+import Statistics from "./m/pages/statistics";
 import AboutPage from "./m/pages/about";
 import ContactPage from "./m/pages/contact";
 
@@ -34,6 +35,10 @@ const routes = [
   {
     path: "/trips",
     component: Trips,
+  },
+  {
+    path: "/statistics",
+    component: Statistics,
   },
   {
     path: "/profile",

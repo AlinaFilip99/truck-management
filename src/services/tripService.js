@@ -1,8 +1,8 @@
 import ApiClient from "./_base";
 
 class TripService {
-  async getAll() {
-    return await ApiClient.get(`trip`);
+  async getAll(adminId) {
+    return await ApiClient.get(`trip/user/${adminId}`);
   }
 
   async getByTruckId(truckId) {

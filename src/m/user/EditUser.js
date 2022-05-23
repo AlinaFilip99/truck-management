@@ -22,8 +22,6 @@ const EditUser = ({ visible, onHide, reload, user, isAdmin }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const saveUser = () => {
-    console.log(userName);
-    console.log(user.id);
     clientService
       .editUser({
         userId: isAdmin ? user.userId : user.id,
@@ -34,7 +32,6 @@ const EditUser = ({ visible, onHide, reload, user, isAdmin }) => {
         phoneNumber: phoneNumber,
       })
       .then((response) => {
-        console.log(response);
         if (response.succeeded) {
           setUserName("");
           setPlateNumber("");
@@ -71,7 +68,6 @@ const EditUser = ({ visible, onHide, reload, user, isAdmin }) => {
 
   useEffect(() => {
     if (user) {
-      console.log(user);
       setUserName(user.userName);
       setEmail(user.email);
       setPlateNumber(user.plateNumber ? user.plateNumber : "");

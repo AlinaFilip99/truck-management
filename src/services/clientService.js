@@ -25,8 +25,8 @@ class ClientService {
     return await ApiClient.get(`user/id/${userId}`);
   }
 
-  async getTruckAccounts() {
-    return await ApiClient.get(`user/trucks`);
+  async getTruckAccounts(adminId) {
+    return await ApiClient.get(`user/trucks/${adminId}`);
   }
 
   async deleteUser(id) {

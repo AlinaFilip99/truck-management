@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import MenuBar from "../base/MenuBar";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import styled from "styled-components";
 import { Button } from "primereact/button";
 import clientService from "../../services/clientService";
-import Footer from "../base/Footer";
+import AppLayout from "../base/Layout";
 
 const StyledPassword = styled(Password)`
   width: 100%;
@@ -35,17 +34,18 @@ const Login = () => {
       let url;
       localStorage.setItem("isLogged", "true");
       localStorage.setItem("userEmail", email);
-      clientService.getUserRoles({ email: email }).then((data) => {
-        console.log(data);
-        let isAdmin = data.includes("Admin");
-        if (isAdmin) {
-          url = "/trucks";
-        } else {
-          url = "/profile";
-        }
-        console.log(isAdmin);
-        localStorage.setItem("isAdmin", isAdmin.toString());
+      let data = await clientService.getUserRoles({ email: email });
 
+      let isAdmin = data.includes("Admin");
+      if (isAdmin) {
+        url = "/trucks";
+      } else {
+        url = "/profile";
+      }
+
+      localStorage.setItem("isAdmin", isAdmin.toString());
+      clientService.getByEmail(email).then((result) => {
+        localStorage.setItem("CurrentUserId", result.userId);
         window.location.hash = url;
       });
     }
@@ -58,8 +58,7 @@ const Login = () => {
   );
 
   return (
-    <>
-      <MenuBar isLogged={isLogged} />
+    <AppLayout>
       <div
         style={{
           textAlign: "-webkit-center",
@@ -100,8 +99,7 @@ const Login = () => {
           </div>
         </Card>
       </div>
-      <Footer />
-    </>
+    </AppLayout>
   );
 };
 
