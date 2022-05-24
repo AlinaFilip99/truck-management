@@ -191,10 +191,10 @@ const Trips = () => {
       <div
         style={{
           width: "76%",
-          minWidth: "760px",
+          // minWidth: "760px",
           display: "inline-block",
-          marginTop: "40px",
-          marginBottom: "40px",
+          marginTop: "20px",
+          marginBottom: "20px",
         }}
       >
         <Card>

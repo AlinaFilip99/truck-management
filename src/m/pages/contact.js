@@ -60,7 +60,7 @@ const ContactPage = () => {
       <div
         style={{
           textAlign: "-webkit-center",
-          marginTop: "50px",
+          marginTop: "20px",
           // height: "calc(100vh - 64px - 58px)",
         }}
       >

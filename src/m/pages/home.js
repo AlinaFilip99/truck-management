@@ -49,7 +49,7 @@ const Home = () => {
       label: "Details",
       icon: "pi pi-check",
       command: () => {
-        let url = "/truck-details/" + user.id;
+        let url = "/truck-details/" + user.userId;
         window.location.hash = url;
       },
     },
@@ -121,8 +121,8 @@ const Home = () => {
           className="p-button-rounded p-button-text"
           icon="pi pi-ellipsis-v"
           onClick={(event) => {
-            menu.current.toggle(event);
             setUser(rowData);
+            menu.current.toggle(event);
           }}
           aria-controls="popup_menu"
           aria-haspopup
@@ -173,9 +173,10 @@ const Home = () => {
       <div
         style={{
           width: "76%",
-          minWidth: "760px",
+          // minWidth: "760px",
           display: "inline-block",
-          marginTop: "50px",
+          marginTop: "20px",
+          marginBottom: "20px",
         }}
       >
         <Card>

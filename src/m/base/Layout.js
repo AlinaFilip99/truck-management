@@ -13,7 +13,7 @@ const AppLayout = ({ children, userId }) => {
       <div
         style={{
           overflowY: "scroll",
-          maxHeight: "calc(100vh - 64px - 8px)",
+          maxHeight: "calc(100vh - 64px - 68px)",
           overflow: "auto",
         }}
       >

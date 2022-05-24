@@ -190,9 +190,10 @@ const TruckDetails = () => {
       <div
         style={{
           width: "76%",
-          minWidth: "760px",
+          // minWidth: "760px",
           display: "inline-block",
-          marginTop: "50px",
+          marginTop: "20px",
+          marginBottom: "20px",
         }}
       >
         <Card title={user?.plateNumber}>
@@ -282,10 +283,10 @@ const TruckDetails = () => {
       <div
         style={{
           width: "76%",
-          minWidth: "760px",
+          // minWidth: "760px",
           display: "inline-block",
-          marginTop: "40px",
-          marginBottom: "40px",
+          // marginTop: "20px",
+          marginBottom: "20px",
         }}
       >
         <Card>

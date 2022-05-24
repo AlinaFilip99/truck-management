@@ -17,39 +17,6 @@ const StyledMenu = styled(Menubar)`
 
 const MenuBar = (props) => {
   const items = [
-    // {
-    //   label: "Home",
-    //   //   icon: "pi pi-fw pi-file",
-    //   command: () => {
-    //     window.location.hash = "/home";
-    //   },
-    // },
-    // {
-    //   label: "Login",
-    //   style: { display: props.isLogged === "true" ? "none" : "unset" },
-    //   //   icon: "pi pi-fw pi-pencil",
-    //   command: () => {
-    //     window.location.hash = "/login";
-    //   },
-    // },
-    // {
-    //   label: "Register",
-    //   style: { display: props.isLogged === "true" ? "none" : "unset" },
-    //   //   icon: "pi pi-fw pi-user",
-    //   command: () => {
-    //     window.location.hash = "/register";
-    //   },
-    // },
-    // {
-    //   label: "Logout",
-    //   style: { display: props.isLogged === "false" ? "none" : "unset" },
-    //   //   icon: "pi pi-fw pi-pencil",
-    //   command: () => {
-    //     localStorage.setItem("isLogged", "false");
-    //     localStorage.setItem("isAdmin", "false");
-    //     window.location.reload();
-    //   },
-    // },
     {
       label: "Trucks",
       style: {
@@ -59,7 +26,6 @@ const MenuBar = (props) => {
             ? "none"
             : "unset",
       },
-      //   icon: "pi pi-fw pi-user",
       command: () => {
         window.location.hash = "/trucks";
       },
@@ -73,7 +39,6 @@ const MenuBar = (props) => {
             ? "none"
             : "unset",
       },
-      //   icon: "pi pi-fw pi-user",
       command: () => {
         window.location.hash = "/trips-truck/" + props.userId;
       },
@@ -87,7 +52,6 @@ const MenuBar = (props) => {
             ? "none"
             : "unset",
       },
-      //   icon: "pi pi-fw pi-user",
       command: () => {
         window.location.hash = "/trips";
       },
@@ -101,21 +65,20 @@ const MenuBar = (props) => {
             ? "none"
             : "unset",
       },
-      //   icon: "pi pi-fw pi-user",
       command: () => {
         window.location.hash = "/statistics";
-      },
-    },
-    {
-      label: "Contact",
-      command: () => {
-        window.location.hash = "/contact";
       },
     },
     {
       label: "About",
       command: () => {
         window.location.hash = "/about";
+      },
+    },
+    {
+      label: "Contact",
+      command: () => {
+        window.location.hash = "/contact";
       },
     },
   ];
