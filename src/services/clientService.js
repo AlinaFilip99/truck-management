@@ -17,6 +17,12 @@ class ClientService {
     });
   }
 
+  async getAvailableUsers(adminId, startDate, endDate) {
+    return await ApiClient.get(
+      `user/available?adminId=${adminId}&startDate=${startDate}&endDate=${endDate}`
+    );
+  }
+
   async getByEmail(email) {
     return await ApiClient.get(`user/${email}`);
   }

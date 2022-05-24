@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import tripService from "../../services/tripService";
+import clientService from "../../services/clientService";
 
 const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
   const [country, setCountry] = useState("");
@@ -16,6 +17,36 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
+  const [datesSelected, setDatesSelected] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState(users);
+
+  useEffect(() => {
+    const getAvailableUsers = async () => {
+      if (startDate && endDate) {
+        let userId = localStorage.getItem("CurrentUserId");
+        if (userId) {
+          setDatesSelected(true);
+
+          let result = await clientService.getAvailableUsers(
+            userId,
+            startDate
+              .toLocaleString()
+              .replaceAll("/", "%2F")
+              .replaceAll(",", "%2C")
+              .replaceAll(":", "%3A"),
+            endDate
+              .toLocaleString()
+              .replaceAll("/", "%2F")
+              .replaceAll(",", "%2C")
+              .replaceAll(":", "%3A")
+          );
+          console.log(result);
+          setAvailableUsers(result);
+        }
+      }
+    };
+    getAvailableUsers();
+  }, [startDate, endDate]);
 
   const saveTrip = () => {
     tripService
@@ -57,6 +88,7 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
       </div>
     );
   };
+
   return (
     <Dialog
       header="Add new trip"
@@ -143,13 +175,13 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
             />
             <label htmlFor="country">Country</label>
           </span>
-          {showUsers && (
+          {showUsers && datesSelected && (
             <span className="p-float-label mt-4" style={{ marginTop: "20px" }}>
               <Dropdown
                 style={{ width: "100%" }}
                 id="users"
                 value={selectedUser}
-                options={users}
+                options={availableUsers}
                 onChange={(e) => setSelectedUser(e.target.value)}
                 optionLabel="userName"
                 optionValue="id"
