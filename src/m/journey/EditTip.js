@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+import TripTimeline from "../base/TripTimeline";
 import tripService from "../../services/tripService";
 
 const EditTrip = ({
@@ -24,6 +25,7 @@ const EditTrip = ({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
+  const [numberOfPauses, setNumberOfPauses] = useState(0);
 
   useEffect(() => {
     if (trip) {
@@ -42,8 +44,10 @@ const EditTrip = ({
       setDuration(duration);
       setStartDate(new Date(trip.startDateTime));
       setEndDate(new Date(trip.endDateTime));
+      updateEndDate();
       setSelectedUser(trip.userId);
     }
+    //eslint-disable-next-line
   }, [trip]);
 
   const saveTrip = () => {
@@ -87,6 +91,42 @@ const EditTrip = ({
       </div>
     );
   };
+
+  const updateEndDate = () => {
+    if (duration && startDate) {
+      var dateMillis = startDate.getTime();
+
+      //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
+      var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
+
+      var parts = timePeriod.split(/:/);
+      var timePeriodMillis =
+        parseInt(parts[0], 10) * 60 * 60 * 1000 +
+        parseInt(parts[1], 10) * 60 * 1000 +
+        parseInt(parts[2], 10) * 1000;
+      var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
+
+      let numberPauses = parseInt(
+        timePeriodMillis / drivingPeriodMillis - 1,
+        10
+      );
+      setNumberOfPauses(numberPauses);
+
+      if (numberPauses >= 0) {
+        timePeriodMillis = timePeriodMillis + numberPauses * 45 * 60 * 1000;
+      }
+
+      // if (parseInt(parts[0], 10) === 13) {
+      //   timePeriodMillis = timePeriodMillis + 11 * 60 * 60 * 1000;
+      // }
+
+      var newDate = new Date();
+      newDate.setTime(dateMillis + timePeriodMillis);
+
+      setEndDate(newDate);
+    }
+  };
+
   return (
     <Dialog
       header="Edit trip"
@@ -96,15 +136,8 @@ const EditTrip = ({
       style={{ width: "50vw" }}
       footer={renderFooter}
     >
-      <div
-        className="p-d-flex p-jc-between"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "5px",
-        }}
-      >
-        <div className="col-5" style={{ marginRight: "20px", width: "48%" }}>
+      <div className="grid">
+        <div className={startDate && endDate ? "col-4" : "col-6"}>
           <span className="p-float-label mt-4" style={{ marginBottom: "20px" }}>
             <Calendar
               id="startDate"
@@ -112,32 +145,11 @@ const EditTrip = ({
               onChange={(e) => {
                 setStartDate(e.value);
               }}
-              onHide={
-                !showAll
-                  ? () => {
-                      if (startDate) {
-                        var dateMillis = startDate.getTime();
-
-                        //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
-                        var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
-
-                        var parts = timePeriod.split(/:/);
-                        var timePeriodMillis =
-                          parseInt(parts[0], 10) * 60 * 60 * 1000 +
-                          parseInt(parts[1], 10) * 60 * 1000 +
-                          parseInt(parts[2], 10) * 1000;
-
-                        var newDate = new Date();
-                        newDate.setTime(dateMillis + timePeriodMillis);
-
-                        setEndDate(newDate);
-                      }
-                    }
-                  : () => {}
-              }
+              onHide={!showAll ? updateEndDate : () => {}}
               showTime
               hourFormat="12"
               showIcon
+              maxDate={endDate}
             />
             <label htmlFor="startDate">Start date</label>
           </span>
@@ -150,9 +162,30 @@ const EditTrip = ({
                 setDuration(e.value);
               }}
               disabled={!showAll}
+              onHide={updateEndDate}
+              timeOnly
+              showSeconds
+              stepMinute={1}
+            />
+            <label htmlFor="duration">Duration</label>
+          </span>
+          {numberOfPauses > 0 && (
+            <span>
+              In this trip there will be {numberOfPauses}{" "}
+              {numberOfPauses > 1 ? "stops" : "stop"}!
+            </span>
+          )}
+          <span className="p-float-label mt-4" style={{ marginBottom: "20px" }}>
+            <Calendar
+              id="endDate"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.value);
+              }}
+              minDate={startDate}
               onHide={() => {
-                if (startDate) {
-                  var dateMillis = startDate.getTime();
+                if (duration && endDate) {
+                  var dateMillis = endDate.getTime();
 
                   //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
                   var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
@@ -162,25 +195,28 @@ const EditTrip = ({
                     parseInt(parts[0], 10) * 60 * 60 * 1000 +
                     parseInt(parts[1], 10) * 60 * 1000 +
                     parseInt(parts[2], 10) * 1000;
+                  var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
+
+                  let numberPauses = parseInt(
+                    timePeriodMillis / drivingPeriodMillis - 1,
+                    10
+                  );
+                  setNumberOfPauses(numberPauses);
+
+                  if (numberPauses >= 0) {
+                    timePeriodMillis =
+                      timePeriodMillis + numberPauses * 45 * 60 * 1000;
+                  }
+
+                  // if (parseInt(parts[0], 10) === 13) {
+                  //   timePeriodMillis = timePeriodMillis + 11 * 60 * 60 * 1000;
+                  // }
 
                   var newDate = new Date();
-                  newDate.setTime(dateMillis + timePeriodMillis);
+                  newDate.setTime(dateMillis - timePeriodMillis);
 
-                  setEndDate(newDate);
+                  setStartDate(newDate);
                 }
-              }}
-              timeOnly
-              showSeconds
-              stepMinute={1}
-            />
-            <label htmlFor="duration">Duration</label>
-          </span>
-          <span className="p-float-label mt-4" style={{ marginBottom: "20px" }}>
-            <Calendar
-              id="endDate"
-              value={endDate}
-              onChange={(e) => {
-                setEndDate(e.value);
               }}
               disabled={!showAll}
               showTime
@@ -222,7 +258,7 @@ const EditTrip = ({
         </div>
         {showAll && (
           <>
-            <div className="col-5" style={{ width: "48%" }}>
+            <div className={startDate && endDate ? "col-4" : "col-6"}>
               <span className="p-float-label mt-4">
                 <InputText
                   style={{ width: "100%" }}
@@ -270,6 +306,15 @@ const EditTrip = ({
               </span>
             </div>
           </>
+        )}
+        {startDate && endDate && (
+          <div className="col-4">
+            <TripTimeline
+              startDate={startDate}
+              endDate={endDate}
+              duration={duration}
+            />
+          </div>
         )}
       </div>
     </Dialog>
