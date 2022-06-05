@@ -158,7 +158,7 @@ const AboutPage = () => {
   };
 
   return (
-    <AppLayout>
+    <AppLayout userId={localStorage.getItem("CurrentUserId")}>
       <div
         className="grid"
         style={{

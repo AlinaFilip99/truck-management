@@ -14,6 +14,7 @@ import styled from "styled-components";
 import AddTrip from "../journey/AddTrip";
 import EditTrip from "../journey/EditTip";
 import AppLayout from "../base/Layout";
+import ViewTrip from "../journey/ViewTrip";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -33,6 +34,7 @@ const TruckDetails = () => {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [displayAddTrip, setDisplayAddTrip] = useState(false);
   const [displayEditTrip, setDisplayEditTrip] = useState(false);
+  const [displayPreviewTrip, setDisplayPreviewTrip] = useState(false);
   const menu = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -46,6 +48,13 @@ const TruckDetails = () => {
   }
 
   const items = [
+    {
+      label: "Preview",
+      icon: "pi pi-eye",
+      command: () => {
+        onClick("displayPreviewTrip");
+      },
+    },
     {
       label: "Edit",
       icon: "pi pi-refresh",
@@ -175,6 +184,7 @@ const TruckDetails = () => {
   const dialogFuncMap = {
     displayAddTrip: setDisplayAddTrip,
     displayEditTrip: setDisplayEditTrip,
+    displayPreviewTrip: setDisplayPreviewTrip,
   };
 
   const onClick = (name) => {
@@ -369,6 +379,12 @@ const TruckDetails = () => {
         reload={loadTrips}
         trip={trip}
         showAll={true}
+      />
+      <ViewTrip
+        visible={displayPreviewTrip}
+        onHide={() => {
+          onHide("displayPreviewTrip");
+        }}
       />
     </AppLayout>
   );

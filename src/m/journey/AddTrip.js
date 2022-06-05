@@ -7,6 +7,11 @@ import { Dropdown } from "primereact/dropdown";
 import tripService from "../../services/tripService";
 import clientService from "../../services/clientService";
 import TripTimeline from "../base/TripTimeline";
+import styled from "styled-components";
+
+const StyledErrorMessage = styled.span`
+  color: red;
+`;
 
 const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
   const [country, setCountry] = useState("");
@@ -21,16 +26,17 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
   const [datesSelected, setDatesSelected] = useState(false);
   const [availableUsers, setAvailableUsers] = useState(users);
   const [numberOfPauses, setNumberOfPauses] = useState(0);
+  const [validDates, setValidDates] = useState(true);
 
   useEffect(() => {
     const getAvailableUsers = async () => {
       if (startDate && endDate) {
-        let userId = localStorage.getItem("CurrentUserId");
-        if (userId) {
+        let currentUserId = localStorage.getItem("CurrentUserId");
+        if (currentUserId) {
           setDatesSelected(true);
 
           let result = await clientService.getAvailableUsers(
-            userId,
+            currentUserId,
             startDate
               .toLocaleString()
               .replaceAll("/", "%2F")
@@ -44,10 +50,20 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
           );
 
           setAvailableUsers(result);
+          if (!showUsers) {
+            let existentUser = result.find((x) => x.userId === userId);
+            if (!existentUser) {
+              setValidDates(false);
+            } else {
+              setValidDates(true);
+            }
+          }
         }
       }
     };
     getAvailableUsers();
+
+    //eslint-disable-next-line
   }, [startDate, endDate]);
 
   const saveTrip = () => {
@@ -86,7 +102,13 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
           onClick={onHide}
           className="p-button-text"
         />
-        <Button label="Save" icon="pi pi-check" onClick={saveTrip} autoFocus />
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          onClick={saveTrip}
+          autoFocus
+          disabled={!validDates}
+        />
       </div>
     );
   };
@@ -224,6 +246,9 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
             />
             <label htmlFor="endDate">End date</label>
           </span>
+          {!showUsers && !validDates && (
+            <StyledErrorMessage>Invalid dates!</StyledErrorMessage>
+          )}
           <span className="p-float-label mt-4">
             <InputText
               style={{ width: "100%" }}

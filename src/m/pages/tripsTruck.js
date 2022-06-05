@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Card } from "primereact/card";
 import tripService from "../../services/tripService";
@@ -7,11 +7,10 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode } from "primereact/api";
-import { Menu } from "primereact/menu";
 import { confirmDialog } from "primereact/confirmdialog";
 import styled from "styled-components";
-import EditTrip from "../journey/EditTip";
 import AppLayout from "../base/Layout";
+import { getEndDate } from "../utils/util";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -28,8 +27,6 @@ const TripsTruck = () => {
   const [userTrips, setUserTrips] = useState([]);
   const [trip, setTrip] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [displayEditTrip, setDisplayEditTrip] = useState(false);
-  const menu = useRef(null);
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -40,23 +37,6 @@ const TripsTruck = () => {
   if (isLogged === "false") {
     window.location.hash = "/login";
   }
-
-  const items = [
-    {
-      label: "Change start date",
-      icon: "pi pi-refresh",
-      command: () => {
-        onClick("displayEditTrip");
-      },
-    },
-    {
-      label: "Delete",
-      icon: "pi pi-times",
-      command: () => {
-        confirmDelete();
-      },
-    },
-  ];
 
   const confirmDelete = () => {
     confirmDialog({
@@ -98,18 +78,75 @@ const TripsTruck = () => {
     setGlobalFilterValue(value);
   };
 
+  const startTrip = (data) => {
+    let now = new Date();
+    data.startDateTime = now.toLocaleString();
+    data.endDateTime = getEndDate(now, data.duration).toLocaleString();
+    data.isActive = true;
+    data.isFinished = false;
+    data.isDoneInTime = false;
+    tripService.editTrip(data).then(() => loadTrips());
+  };
+
+  const endTrip = (data) => {
+    data.isActive = false;
+    data.isFinished = true;
+    data.isDoneInTime = true;
+    let now = new Date();
+    if (now.getTime() > new Date(data.endDateTime).getTime()) {
+      data.isDoneInTime = false;
+    }
+    data.endDateTime = now.toLocaleString();
+    let startDateTime = new Date(data.startDateTime);
+    let duration = new Date();
+    let durationTime = now.getTime() - startDateTime.getTime();
+    duration.setTime(durationTime - 2 * 60 * 60 * 1000);
+    data.duration = duration.toLocaleTimeString("it-IT");
+    tripService.editTrip(data).then(() => loadTrips());
+  };
+
   const actionBodyTemplate = (rowData) => {
+    if (!rowData.isFinished) {
+      if (rowData.isActive) {
+        return (
+          <>
+            <Button
+              className="p-button-rounded p-button-text"
+              icon="pi pi-pause"
+              onClick={() => endTrip(rowData)}
+            />
+          </>
+        );
+      } else {
+        return (
+          <>
+            <Button
+              className="p-button-rounded p-button-text"
+              icon="pi pi-play"
+              onClick={() => startTrip(rowData)}
+            />
+          </>
+        );
+      }
+    } else {
+      return (
+        <>
+          <i className="pi pi-check-circle" style={{ color: "green" }}></i>
+        </>
+      );
+    }
+  };
+
+  const deleteBodyTemplate = (rowData) => {
     return (
       <>
         <Button
-          className="p-button-rounded p-button-text"
-          icon="pi pi-ellipsis-v"
-          onClick={(event) => {
-            menu.current.toggle(event);
+          className="p-button-rounded p-button-text p-button-danger"
+          icon="pi pi-trash"
+          onClick={() => {
             setTrip(rowData);
+            confirmDelete();
           }}
-          aria-controls="popup_menu"
-          aria-haspopup
         />
       </>
     );
@@ -160,18 +197,6 @@ const TripsTruck = () => {
     );
   };
 
-  const dialogFuncMap = {
-    displayEditTrip: setDisplayEditTrip,
-  };
-
-  const onClick = (name) => {
-    dialogFuncMap[`${name}`](true);
-  };
-
-  const onHide = (name) => {
-    dialogFuncMap[`${name}`](false);
-  };
-
   return (
     <AppLayout>
       <div
@@ -212,6 +237,11 @@ const TripsTruck = () => {
               body={actionBodyTemplate}
             />
             <Column
+              headerStyle={{ width: "4rem", textAlign: "center" }}
+              bodyStyle={{ textAlign: "center", overflow: "visible" }}
+              body={deleteBodyTemplate}
+            />
+            <Column
               field="tripId"
               header="Id"
               sortable
@@ -246,16 +276,6 @@ const TripsTruck = () => {
           </StyledDataTable>
         </Card>
       </div>
-      <Menu model={items} popup ref={menu} id="popup_menu" />
-      <EditTrip
-        visible={displayEditTrip}
-        onHide={() => {
-          onHide("displayEditTrip");
-        }}
-        reload={loadTrips}
-        trip={trip}
-        showAll={false}
-      />
     </AppLayout>
   );
 };

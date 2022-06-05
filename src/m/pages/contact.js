@@ -55,7 +55,7 @@ const ContactPage = () => {
   );
 
   return (
-    <AppLayout>
+    <AppLayout userId={localStorage.getItem("CurrentUserId")}>
       <Toast ref={toast} />
       <div
         style={{

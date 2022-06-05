@@ -6,6 +6,12 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import TripTimeline from "../base/TripTimeline";
 import tripService from "../../services/tripService";
+import styled from "styled-components";
+import clientService from "../../services/clientService";
+
+const StyledErrorMessage = styled.span`
+  color: red;
+`;
 
 const EditTrip = ({
   visible,
@@ -26,6 +32,39 @@ const EditTrip = ({
   const [endDate, setEndDate] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [numberOfPauses, setNumberOfPauses] = useState(0);
+  const [validDates, setValidDates] = useState(true);
+
+  useEffect(() => {
+    const getAvailableUsers = async () => {
+      if (selectedUser) {
+        let currentUserId = localStorage.getItem("CurrentUserId");
+        if (currentUserId) {
+          let result = await clientService.getAvailableUsers(
+            currentUserId,
+            startDate
+              .toLocaleString()
+              .replaceAll("/", "%2F")
+              .replaceAll(",", "%2C")
+              .replaceAll(":", "%3A"),
+            endDate
+              .toLocaleString()
+              .replaceAll("/", "%2F")
+              .replaceAll(",", "%2C")
+              .replaceAll(":", "%3A")
+          );
+
+          let existentUser = result.find((x) => x.userId === selectedUser);
+          if (!existentUser) {
+            setValidDates(false);
+          } else {
+            setValidDates(true);
+          }
+        }
+      }
+    };
+    getAvailableUsers();
+    //eslint-disable-next-line
+  }, [selectedUser]);
 
   useEffect(() => {
     if (trip) {
@@ -87,7 +126,13 @@ const EditTrip = ({
           onClick={onHide}
           className="p-button-text"
         />
-        <Button label="Save" icon="pi pi-check" onClick={saveTrip} autoFocus />
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          onClick={saveTrip}
+          autoFocus
+          disabled={!validDates}
+        />
       </div>
     );
   };
@@ -225,6 +270,9 @@ const EditTrip = ({
             />
             <label htmlFor="endDate">End date</label>
           </span>
+          {!validDates && (
+            <StyledErrorMessage>Invalid dates!</StyledErrorMessage>
+          )}
           {showAll && (
             <>
               <span className="p-float-label mt-4">
@@ -248,7 +296,7 @@ const EditTrip = ({
                     options={users}
                     onChange={(e) => setSelectedUser(e.target.value)}
                     optionLabel="userName"
-                    optionValue="id"
+                    optionValue="userId"
                   />
                   <label htmlFor="users">Users</label>
                 </span>
