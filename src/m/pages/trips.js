@@ -14,6 +14,7 @@ import AddTrip from "../journey/AddTrip";
 import clientService from "../../services/clientService";
 import AppLayout from "../base/Layout";
 import ViewTrip from "../journey/ViewTrip";
+import { Tooltip } from "primereact/tooltip";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -132,6 +133,45 @@ const Trips = () => {
     );
   };
 
+  const statusBodyTemplate = (rowData) => {
+    if (!rowData.isFinished) {
+      if (rowData.isActive) {
+        return (
+          <>
+            <Tooltip target=".active-shipment" />
+            <i
+              className="pi pi-flag-fill active-shipment"
+              style={{ color: "yellow" }}
+              data-pr-tooltip="Active"
+            ></i>
+          </>
+        );
+      } else {
+        return (
+          <>
+            <Tooltip target=".inactive-shipment" />
+            <i
+              className="pi pi-flag-fill inactive-shipment"
+              style={{ color: "#a1a1a1" }}
+              data-pr-tooltip="Inactive"
+            ></i>
+          </>
+        );
+      }
+    } else {
+      return (
+        <>
+          <Tooltip target=".finished-shipment" />
+          <i
+            className="pi pi-flag-fill finished-shipment"
+            style={{ color: "#78c577" }}
+            data-pr-tooltip="Done"
+          ></i>
+        </>
+      );
+    }
+  };
+
   const renderHeader = () => {
     return (
       <>
@@ -234,6 +274,14 @@ const Trips = () => {
               headerStyle={{ width: "4rem", textAlign: "center" }}
               bodyStyle={{ textAlign: "center", overflow: "visible" }}
               body={actionBodyTemplate}
+            />
+            <Column
+              header="Status"
+              sortable
+              sortField="isFinished"
+              bodyStyle={{ textAlign: "center", overflow: "visible" }}
+              style={{ minWidth: "4rem" }}
+              body={statusBodyTemplate}
             />
             <Column
               field="tripId"

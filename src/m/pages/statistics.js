@@ -11,6 +11,12 @@ const StyledLabel = styled.div`
   font-size: smaller;
 `;
 
+const StyledStatisticLabel = styled.div`
+  font-weight: 500;
+  padding-bottom: 5px;
+  color: dimgray;
+`;
+
 const StyledNumber = styled.div`
   color: dimgrey;
   font-size: x-large;
@@ -18,6 +24,10 @@ const StyledNumber = styled.div`
 
 const StyledCard = styled(Card)`
   margin-bottom: 20px;
+  .card-title {
+    text-align: start;
+    color: #a3a0d2;
+  }
 `;
 
 const Statistics = () => {
@@ -283,7 +293,9 @@ const Statistics = () => {
           // marginBottom: "40px",
         }}
       >
-        <StyledCard>
+        <StyledCard
+          title={<div className="card-title">General shipments info</div>}
+        >
           <div className="grid">
             <div className="col-9" style={{ paddingBottom: "unset" }}>
               <div className="grid" style={{ height: "100%" }}>
@@ -314,27 +326,36 @@ const Statistics = () => {
             </div>
             <div className="col-3">
               {doneInTimeData && (
-                <Chart
-                  type="doughnut"
-                  data={doneInTimeData}
-                  options={lightOptions}
-                  style={{
-                    position: "relative",
-                    width: "70%",
-                  }}
-                />
+                <>
+                  <StyledStatisticLabel style={{ float: "left" }}>
+                    Un/finished on time:
+                  </StyledStatisticLabel>
+                  <Chart
+                    type="doughnut"
+                    data={doneInTimeData}
+                    options={lightOptions}
+                    style={{
+                      position: "relative",
+                      width: "70%",
+                    }}
+                  />
+                </>
               )}
             </div>
           </div>
         </StyledCard>
-        <StyledCard>
+        <StyledCard
+          title={<div className="card-title">Trucks shipments info</div>}
+        >
           {trucksTripData && (
             <div>
               <Chart type="bar" data={trucksTripData} options={basicOptions} />
             </div>
           )}
         </StyledCard>
-        <StyledCard>
+        <StyledCard
+          title={<div className="card-title">Number of shipments in time</div>}
+        >
           {tripsPerDayData && (
             <div>
               <Chart
