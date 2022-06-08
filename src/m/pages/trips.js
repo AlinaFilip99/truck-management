@@ -122,8 +122,8 @@ const Trips = () => {
           className="p-button-rounded p-button-text"
           icon="pi pi-ellipsis-v"
           onClick={(event) => {
-            menu.current.toggle(event);
             setTrip(rowData);
+            menu.current.toggle(event);
           }}
           aria-controls="popup_menu"
           aria-haspopup
@@ -296,6 +296,7 @@ const Trips = () => {
         onHide={() => {
           onHide("displayPreviewTrip");
         }}
+        data={trip}
       />
     </AppLayout>
   );

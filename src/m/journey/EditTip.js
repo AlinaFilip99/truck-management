@@ -8,6 +8,7 @@ import TripTimeline from "../base/TripTimeline";
 import tripService from "../../services/tripService";
 import styled from "styled-components";
 import clientService from "../../services/clientService";
+import LocationMap from "../base/LocationMap";
 
 const StyledErrorMessage = styled.span`
   color: red;
@@ -33,6 +34,7 @@ const EditTrip = ({
   const [selectedUser, setSelectedUser] = useState("");
   const [numberOfPauses, setNumberOfPauses] = useState(0);
   const [validDates, setValidDates] = useState(true);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const getAvailableUsers = async () => {
@@ -172,13 +174,29 @@ const EditTrip = ({
     }
   };
 
+  const setAddress = (data) => {
+    console.log(data);
+    setCountry(data.country || "");
+    setRegion(data.region || "");
+    setCity(data.locality || "");
+    setStreet(data.street || "");
+    let moreInfo = "";
+    if (data.number) {
+      moreInfo = `street number ${data.number}, `;
+    }
+    if (data.name) {
+      moreInfo = moreInfo + data.name;
+    }
+    setMore(moreInfo);
+  };
+
   return (
     <Dialog
       header="Edit trip"
       visible={visible}
       onHide={onHide}
       breakpoints={{ "960px": "75vw" }}
-      style={{ width: "50vw" }}
+      style={{ width: "50vw", height: "fit-content" }}
       footer={renderFooter}
     >
       <div className="grid">
@@ -342,7 +360,7 @@ const EditTrip = ({
               </span>
               <span
                 className="p-float-label mt-4"
-                style={{ marginTop: "20px" }}
+                style={{ marginTop: "20px", marginBottom: "20px" }}
               >
                 <InputText
                   style={{ width: "100%" }}
@@ -351,6 +369,16 @@ const EditTrip = ({
                   onChange={(e) => setMore(e.target.value)}
                 />
                 <label htmlFor="more">More info</label>
+              </span>
+              <span style={{ marginTop: "20px" }}>
+                <Button
+                  className="p-button-text"
+                  icon="pi pi-map-marker"
+                  onClick={() => {
+                    setShowMap(true);
+                  }}
+                  label="Choose on map"
+                />
               </span>
             </div>
           </>
@@ -365,6 +393,24 @@ const EditTrip = ({
           </div>
         )}
       </div>
+      <Dialog
+        visible={showMap}
+        onHide={() => {
+          setShowMap(false);
+        }}
+        style={{ width: "90vh" }}
+        footer={
+          <div>
+            <Button
+              label="Done"
+              icon="pi pi-check"
+              onClick={() => setShowMap(false)}
+            />
+          </div>
+        }
+      >
+        <LocationMap isSelectable={true} setAddressInfo={setAddress} />
+      </Dialog>
     </Dialog>
   );
 };

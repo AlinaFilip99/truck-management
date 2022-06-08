@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Card } from "primereact/card";
 import tripService from "../../services/tripService";
@@ -8,9 +8,12 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode } from "primereact/api";
 import { confirmDialog } from "primereact/confirmdialog";
+import { Menu } from "primereact/menu";
 import styled from "styled-components";
 import AppLayout from "../base/Layout";
 import { getEndDate } from "../utils/util";
+import ViewTrip from "../journey/ViewTrip";
+import { Tooltip } from "primereact/tooltip";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -27,6 +30,8 @@ const TripsTruck = () => {
   const [userTrips, setUserTrips] = useState([]);
   const [trip, setTrip] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [displayPreviewTrip, setDisplayPreviewTrip] = useState(false);
+  const menu = useRef(null);
 
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -37,6 +42,23 @@ const TripsTruck = () => {
   if (isLogged === "false") {
     window.location.hash = "/login";
   }
+
+  const items = [
+    {
+      label: "Preview",
+      icon: "pi pi-eye",
+      command: () => {
+        onClick("displayPreviewTrip");
+      },
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-times",
+      command: () => {
+        confirmDelete();
+      },
+    },
+  ];
 
   const confirmDelete = () => {
     confirmDialog({
@@ -65,7 +87,18 @@ const TripsTruck = () => {
 
   const loadTrips = () => {
     tripService.getByTruckId(_userid).then((data) => {
-      setUserTrips(data);
+      console.log(data);
+      let unfinished = data.filter((x) => x.isFinished === false);
+      let finished = data.filter((x) => x.isFinished === true);
+      let unfinishedActive = unfinished.filter((x) => x.isActive === true);
+      let unfinishedInactive = unfinished.filter((x) => x.isActive === false);
+      let orderedData = [
+        ...unfinishedActive,
+        ...unfinishedInactive,
+        ...finished,
+      ];
+      console.log(orderedData);
+      setUserTrips(orderedData);
     });
   };
 
@@ -105,7 +138,7 @@ const TripsTruck = () => {
     tripService.editTrip(data).then(() => loadTrips());
   };
 
-  const actionBodyTemplate = (rowData) => {
+  const statusBodyTemplate = (rowData) => {
     if (!rowData.isFinished) {
       if (rowData.isActive) {
         return (
@@ -114,6 +147,7 @@ const TripsTruck = () => {
               className="p-button-rounded p-button-text"
               icon="pi pi-pause"
               onClick={() => endTrip(rowData)}
+              tooltip="Active. Click to finish!"
             />
           </>
         );
@@ -124,6 +158,7 @@ const TripsTruck = () => {
               className="p-button-rounded p-button-text"
               icon="pi pi-play"
               onClick={() => startTrip(rowData)}
+              tooltip="Inactive. Click to start!"
             />
           </>
         );
@@ -131,22 +166,29 @@ const TripsTruck = () => {
     } else {
       return (
         <>
-          <i className="pi pi-check-circle" style={{ color: "green" }}></i>
+          <Tooltip target=".finished-shipment" />
+          <i
+            className="pi pi-check-circle finished-shipment"
+            style={{ color: "green" }}
+            data-pr-tooltip="Done"
+          ></i>
         </>
       );
     }
   };
 
-  const deleteBodyTemplate = (rowData) => {
+  const actionBodyTemplate = (rowData) => {
     return (
       <>
         <Button
-          className="p-button-rounded p-button-text p-button-danger"
-          icon="pi pi-trash"
-          onClick={() => {
+          className="p-button-rounded p-button-text"
+          icon="pi pi-ellipsis-v"
+          onClick={(event) => {
             setTrip(rowData);
-            confirmDelete();
+            menu.current.toggle(event);
           }}
+          aria-controls="popup_menu"
+          aria-haspopup
         />
       </>
     );
@@ -197,6 +239,18 @@ const TripsTruck = () => {
     );
   };
 
+  const dialogFuncMap = {
+    displayPreviewTrip: setDisplayPreviewTrip,
+  };
+
+  const onClick = (name) => {
+    dialogFuncMap[`${name}`](true);
+  };
+
+  const onHide = (name) => {
+    dialogFuncMap[`${name}`](false);
+  };
+
   return (
     <AppLayout>
       <div
@@ -231,15 +285,28 @@ const TripsTruck = () => {
             emptyMessage="No trips found."
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
           >
+            {/* <Column
+              headerStyle={{ width: "4rem", textAlign: "center" }}
+              bodyStyle={{ textAlign: "center", overflow: "visible" }}
+              body={previewBodyTemplate}
+            /> */}
             <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}
               bodyStyle={{ textAlign: "center", overflow: "visible" }}
               body={actionBodyTemplate}
             />
-            <Column
+            {/* <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}
               bodyStyle={{ textAlign: "center", overflow: "visible" }}
               body={deleteBodyTemplate}
+            /> */}
+            <Column
+              header="Status"
+              sortable
+              sortField="isFinished"
+              bodyStyle={{ textAlign: "center", overflow: "visible" }}
+              style={{ minWidth: "4rem" }}
+              body={statusBodyTemplate}
             />
             <Column
               field="tripId"
@@ -275,6 +342,14 @@ const TripsTruck = () => {
             />
           </StyledDataTable>
         </Card>
+        <Menu model={items} popup ref={menu} id="popup_menu" />
+        <ViewTrip
+          visible={displayPreviewTrip}
+          onHide={() => {
+            onHide("displayPreviewTrip");
+          }}
+          data={trip}
+        />
       </div>
     </AppLayout>
   );

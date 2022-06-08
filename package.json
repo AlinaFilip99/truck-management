@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@formspree/react": "^2.2.4",
+    "@googlemaps/js-api-loader": "^1.14.3",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +17,7 @@
     "primereact": "^7.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-geocode": "^0.2.3",
     "react-promise-tracker": "^2.1.0",
     "react-router": "^6.2.1",
     "react-router-dom": "^5.1.2",
@@ -47,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/google.maps": "^3.49.2"
   }
 }
