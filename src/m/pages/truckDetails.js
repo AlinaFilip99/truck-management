@@ -147,7 +147,7 @@ const TruckDetails = () => {
             <Tooltip target=".active-shipment" />
             <i
               className="pi pi-flag-fill active-shipment"
-              style={{ color: "yellow" }}
+              style={{ color: "#00b4ff" }}
               data-pr-tooltip="Active"
             ></i>
           </>

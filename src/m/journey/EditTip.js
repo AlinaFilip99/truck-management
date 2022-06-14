@@ -35,38 +35,47 @@ const EditTrip = ({
   const [numberOfPauses, setNumberOfPauses] = useState(0);
   const [validDates, setValidDates] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [initialStartDate, setInitialStartDate] = useState("");
+  const [initialEndDate, setInitialEndDate] = useState("");
 
   useEffect(() => {
     const getAvailableUsers = async () => {
       if (selectedUser) {
         let currentUserId = localStorage.getItem("CurrentUserId");
         if (currentUserId) {
-          let result = await clientService.getAvailableUsers(
-            currentUserId,
-            startDate
-              .toLocaleString()
-              .replaceAll("/", "%2F")
-              .replaceAll(",", "%2C")
-              .replaceAll(":", "%3A"),
-            endDate
-              .toLocaleString()
-              .replaceAll("/", "%2F")
-              .replaceAll(",", "%2C")
-              .replaceAll(":", "%3A")
-          );
+          try {
+            let result = await clientService.getAvailableUsers(
+              currentUserId,
+              startDate
+                .toLocaleString()
+                .replaceAll("/", "%2F")
+                .replaceAll(",", "%2C")
+                .replaceAll(":", "%3A"),
+              endDate
+                .toLocaleString()
+                .replaceAll("/", "%2F")
+                .replaceAll(",", "%2C")
+                .replaceAll(":", "%3A")
+            );
 
-          let existentUser = result.find((x) => x.userId === selectedUser);
-          if (!existentUser) {
-            setValidDates(false);
-          } else {
-            setValidDates(true);
+            let existentUser = result.find((x) => x.userId === selectedUser);
+            if (
+              existentUser ||
+              (startDate >= initialStartDate && endDate <= initialEndDate)
+            ) {
+              setValidDates(true);
+            } else {
+              setValidDates(false);
+            }
+          } catch (error) {
+            console.log(error);
           }
         }
       }
     };
     getAvailableUsers();
     //eslint-disable-next-line
-  }, [selectedUser]);
+  }, [selectedUser, startDate, endDate]);
 
   useEffect(() => {
     if (trip) {
@@ -85,7 +94,8 @@ const EditTrip = ({
       setDuration(duration);
       setStartDate(new Date(trip.startDateTime));
       setEndDate(new Date(trip.endDateTime));
-      updateEndDate();
+      setInitialStartDate(new Date(trip.startDateTime));
+      setInitialEndDate(new Date(trip.endDateTime));
       setSelectedUser(trip.userId);
     }
     //eslint-disable-next-line
@@ -139,41 +149,6 @@ const EditTrip = ({
     );
   };
 
-  const updateEndDate = () => {
-    if (duration && startDate) {
-      var dateMillis = startDate.getTime();
-
-      //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
-      var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
-
-      var parts = timePeriod.split(/:/);
-      var timePeriodMillis =
-        parseInt(parts[0], 10) * 60 * 60 * 1000 +
-        parseInt(parts[1], 10) * 60 * 1000 +
-        parseInt(parts[2], 10) * 1000;
-      var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
-
-      let numberPauses = parseInt(
-        timePeriodMillis / drivingPeriodMillis - 1,
-        10
-      );
-      setNumberOfPauses(numberPauses);
-
-      if (numberPauses >= 0) {
-        timePeriodMillis = timePeriodMillis + numberPauses * 45 * 60 * 1000;
-      }
-
-      // if (parseInt(parts[0], 10) === 13) {
-      //   timePeriodMillis = timePeriodMillis + 11 * 60 * 60 * 1000;
-      // }
-
-      var newDate = new Date();
-      newDate.setTime(dateMillis + timePeriodMillis);
-
-      setEndDate(newDate);
-    }
-  };
-
   const setAddress = (data) => {
     setCountry(data.country || "");
     setRegion(data.region || "");
@@ -207,9 +182,7 @@ const EditTrip = ({
               onChange={(e) => {
                 setStartDate(e.value);
               }}
-              onHide={!showAll ? updateEndDate : () => {}}
               showTime
-              hourFormat="12"
               showIcon
               maxDate={endDate}
             />
@@ -224,7 +197,6 @@ const EditTrip = ({
                 setDuration(e.value);
               }}
               disabled={!showAll}
-              onHide={updateEndDate}
               timeOnly
               showSeconds
               stepMinute={1}
@@ -245,44 +217,8 @@ const EditTrip = ({
                 setEndDate(e.value);
               }}
               minDate={startDate}
-              onHide={() => {
-                if (duration && endDate) {
-                  var dateMillis = endDate.getTime();
-
-                  //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
-                  var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
-
-                  var parts = timePeriod.split(/:/);
-                  var timePeriodMillis =
-                    parseInt(parts[0], 10) * 60 * 60 * 1000 +
-                    parseInt(parts[1], 10) * 60 * 1000 +
-                    parseInt(parts[2], 10) * 1000;
-                  var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
-
-                  let numberPauses = parseInt(
-                    timePeriodMillis / drivingPeriodMillis - 1,
-                    10
-                  );
-                  setNumberOfPauses(numberPauses);
-
-                  if (numberPauses >= 0) {
-                    timePeriodMillis =
-                      timePeriodMillis + numberPauses * 45 * 60 * 1000;
-                  }
-
-                  // if (parseInt(parts[0], 10) === 13) {
-                  //   timePeriodMillis = timePeriodMillis + 11 * 60 * 60 * 1000;
-                  // }
-
-                  var newDate = new Date();
-                  newDate.setTime(dateMillis - timePeriodMillis);
-
-                  setStartDate(newDate);
-                }
-              }}
               disabled={!showAll}
               showTime
-              hourFormat="12"
               showIcon
             />
             <label htmlFor="endDate">End date</label>
@@ -386,8 +322,9 @@ const EditTrip = ({
           <div className="col-4">
             <TripTimeline
               startDate={startDate}
-              endDate={endDate}
-              duration={duration}
+              duration={duration.toLocaleTimeString("it-IT")}
+              setEndTime={setEndDate}
+              setPauses={setNumberOfPauses}
             />
           </div>
         )}

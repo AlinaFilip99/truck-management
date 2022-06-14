@@ -101,7 +101,6 @@ const ViewTrip = ({ visible, onHide, data }) => {
             <StyledLabel>Timeline:</StyledLabel>
             <TripTimeline
               startDate={trip.startDateTime}
-              endDate={trip.endDateTime}
               duration={trip.duration}
             />
           </div>

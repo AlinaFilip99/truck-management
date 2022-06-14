@@ -115,44 +115,6 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
     );
   };
 
-  const updateEndDate = () => {
-    if (startDate && duration) {
-      var dateMillis = startDate.getTime();
-
-      //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
-      var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
-
-      var parts = timePeriod.split(/:/);
-      var timePeriodMillis =
-        parseInt(parts[0], 10) * 60 * 60 * 1000 +
-        parseInt(parts[1], 10) * 60 * 1000 +
-        parseInt(parts[2], 10) * 1000;
-      var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
-
-      let numberPauses = parseInt(
-        timePeriodMillis / drivingPeriodMillis - 1,
-        10
-      );
-      setNumberOfPauses(numberPauses);
-
-      if (numberPauses >= 0) {
-        timePeriodMillis = timePeriodMillis + numberPauses * 45 * 60 * 1000;
-      }
-
-      // if (parseInt(parts[0], 10) === 13) {
-      //   timePeriodMillis = timePeriodMillis + 11 * 60 * 60 * 1000;
-      // }
-
-      var newDate = new Date();
-      newDate.setTime(dateMillis + timePeriodMillis);
-
-      setEndDate(newDate);
-    } else {
-      setEndDate("");
-      setNumberOfPauses(0);
-    }
-  };
-
   const setAddress = (data) => {
     setCountry(data.country || "");
     setRegion(data.region || "");
@@ -186,9 +148,7 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
               onChange={(e) => {
                 setStartDate(e.value);
               }}
-              onHide={updateEndDate}
               showTime
-              // hourFormat="12"
               maxDate={endDate}
               showIcon
             />
@@ -202,7 +162,6 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
               onChange={(e) => {
                 setDuration(e.value);
               }}
-              onHide={updateEndDate}
               timeOnly
               showSeconds
               stepMinute={1}
@@ -223,42 +182,7 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
                 setEndDate(e.value);
               }}
               minDate={startDate}
-              onHide={() => {
-                if (duration && endDate) {
-                  var dateMillis = endDate.getTime();
-
-                  //JavaScript doesn't have a "time period" object, so I'm assuming you get it as a string
-                  var timePeriod = duration.toLocaleTimeString("it-IT"); //I assume this is 15 minutes, so the format is HH:MM:SS
-
-                  var parts = timePeriod.split(/:/);
-                  var timePeriodMillis =
-                    parseInt(parts[0], 10) * 60 * 60 * 1000 +
-                    parseInt(parts[1], 10) * 60 * 1000 +
-                    parseInt(parts[2], 10) * 1000;
-                  var drivingPeriodMillis = 4 * 60 * 60 * 1000 + 30 * 60 * 1000;
-
-                  let numberPauses = parseInt(
-                    timePeriodMillis / drivingPeriodMillis - 1,
-                    10
-                  );
-                  setNumberOfPauses(numberPauses);
-
-                  if (numberPauses >= 0) {
-                    timePeriodMillis =
-                      timePeriodMillis + numberPauses * 45 * 60 * 1000;
-                  }
-
-                  var newDate = new Date();
-                  newDate.setTime(dateMillis - timePeriodMillis);
-
-                  setStartDate(newDate);
-                } else {
-                  setStartDate("");
-                  setNumberOfPauses(0);
-                }
-              }}
               showTime
-              // hourFormat="12"
               showIcon
             />
             <label htmlFor="endDate">End date</label>
@@ -345,8 +269,9 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
           <div className="col-4">
             <TripTimeline
               startDate={startDate}
-              endDate={endDate}
-              duration={duration}
+              duration={duration.toLocaleTimeString("it-IT")}
+              setEndTime={setEndDate}
+              setPauses={setNumberOfPauses}
             />
           </div>
         )}

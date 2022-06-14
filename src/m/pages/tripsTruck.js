@@ -116,7 +116,7 @@ const TripsTruck = () => {
   const startTrip = (data) => {
     let now = new Date();
     data.startDateTime = now.toLocaleString();
-    data.endDateTime = getEndDate(now, data.duration).toLocaleString();
+    data.endDateTime = getEndDate(now, data.duration).date.toLocaleString();
     data.isActive = true;
     data.isFinished = false;
     data.isDoneInTime = false;
