@@ -5,10 +5,12 @@ import { Button } from "primereact/button";
 import { confirmDialog } from "primereact/confirmdialog";
 import EditUser from "../user/EditUser";
 import AppLayout from "../base/Layout";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const Profile = () => {
   const [user, setUser] = useState();
   const [displayEditUser, setDisplayEditUser] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isLogged, setIsLogged] = useState(
     localStorage.getItem("isLogged") || "false"
   );
@@ -24,10 +26,12 @@ const Profile = () => {
   }, []);
 
   const load = () => {
+    setLoading(true);
     let userEmail = localStorage.getItem("userEmail");
 
     clientService.getByEmail(userEmail).then((data) => {
       setUser(data);
+      setLoading(false);
     });
   };
 
@@ -88,101 +92,120 @@ const Profile = () => {
           marginTop: "20px",
         }}
       >
-        <Card
-          title={isAdmin === "false" ? user?.plateNumber : user?.userName}
-          footer={footer}
-        >
-          <h4 style={{ textAlign: "left", marginLeft: "10px" }}>
-            Account details
-          </h4>
-          <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-            <div style={{ width: "45%", textAlign: "left" }}>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="id">
-                  Id
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="id">{user?.userId}</span>
-                </div>
-              </div>
-              {isAdmin === "false" && (
-                <div
-                  className="p-field p-col-12 p-md-3"
-                  style={{ padding: "5px" }}
-                >
-                  <label style={{ fontWeight: "bold" }} htmlFor="username">
-                    Username
-                  </label>
-                  <div style={{ marginTop: "2px" }}>
-                    <span id="username">{user?.userName}</span>
-                  </div>
-                </div>
-              )}
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="email">
-                  Email
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="email">{user?.email} </span>
-                </div>
-              </div>
-            </div>
-            <div style={{ width: "45%", textAlign: "left" }}>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="phoneNumber">
-                  Phone number
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="phoneNumber">
-                    {user?.phoneNumber === "" ? "---" : user?.phoneNumber}
-                  </span>
-                </div>
-              </div>
-              {isAdmin === "false" && (
-                <>
-                  <div
-                    className="p-field p-col-12 p-md-3"
-                    style={{ padding: "5px" }}
-                  >
-                    <label style={{ fontWeight: "bold" }} htmlFor="plateNumber">
-                      Licence plate number
-                    </label>
-                    <div style={{ marginTop: "2px" }}>
-                      <span id="plateNumber">
-                        {user?.plateNumber === "" ? "---" : user?.plateNumber}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    className="p-field p-col-12 p-md-3"
-                    style={{ padding: "5px" }}
-                  >
-                    <label
-                      style={{ fontWeight: "bold" }}
-                      htmlFor="driversNumber"
-                    >
-                      Number of drivers
-                    </label>
-                    <div style={{ marginTop: "2px" }}>
-                      <span id="driversNumber">
-                        {user?.driversNumber ? "---" : user?.driversNumber}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+        {loading ? (
+          <div style={{ height: "70vh" }}>
+            <ProgressSpinner
+              style={{
+                position: "fixed",
+                top: "40%",
+                left: "47%",
+              }}
+            />
           </div>
-        </Card>
+        ) : (
+          <Card
+            title={isAdmin === "false" ? user?.plateNumber : user?.userName}
+            footer={footer}
+          >
+            <>
+              <h4 style={{ textAlign: "left", marginLeft: "10px" }}>
+                Account details
+              </h4>
+              <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+                <div style={{ width: "45%", textAlign: "left" }}>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="id">
+                      Id
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="id">{user?.userId}</span>
+                    </div>
+                  </div>
+                  {isAdmin === "false" && (
+                    <div
+                      className="p-field p-col-12 p-md-3"
+                      style={{ padding: "5px" }}
+                    >
+                      <label style={{ fontWeight: "bold" }} htmlFor="username">
+                        Username
+                      </label>
+                      <div style={{ marginTop: "2px" }}>
+                        <span id="username">{user?.userName}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="email">
+                      Email
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="email">{user?.email} </span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ width: "45%", textAlign: "left" }}>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="phoneNumber">
+                      Phone number
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="phoneNumber">
+                        {user?.phoneNumber === "" ? "---" : user?.phoneNumber}
+                      </span>
+                    </div>
+                  </div>
+                  {isAdmin === "false" && (
+                    <>
+                      <div
+                        className="p-field p-col-12 p-md-3"
+                        style={{ padding: "5px" }}
+                      >
+                        <label
+                          style={{ fontWeight: "bold" }}
+                          htmlFor="plateNumber"
+                        >
+                          Licence plate number
+                        </label>
+                        <div style={{ marginTop: "2px" }}>
+                          <span id="plateNumber">
+                            {user?.plateNumber === ""
+                              ? "---"
+                              : user?.plateNumber}
+                          </span>
+                        </div>
+                      </div>
+                      {/* <div
+                        className="p-field p-col-12 p-md-3"
+                        style={{ padding: "5px" }}
+                      >
+                        <label
+                          style={{ fontWeight: "bold" }}
+                          htmlFor="driversNumber"
+                        >
+                          Number of drivers
+                        </label>
+                        <div style={{ marginTop: "2px" }}>
+                          <span id="driversNumber">
+                            {user?.driversNumber ? "---" : user?.driversNumber}
+                          </span>
+                        </div>
+                      </div> */}
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          </Card>
+        )}
       </div>
       <EditUser
         visible={displayEditUser}

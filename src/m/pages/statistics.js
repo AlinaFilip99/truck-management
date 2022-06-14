@@ -5,6 +5,7 @@ import { Chart } from "primereact/chart";
 import clientService from "../../services/clientService";
 import tripService from "../../services/tripService";
 import styled from "styled-components";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const StyledLabel = styled.div`
   color: darkgray;
@@ -31,14 +32,22 @@ const StyledCard = styled(Card)`
 `;
 
 const Statistics = () => {
+  const [isLogged, setIsLogged] = useState(
+    localStorage.getItem("isLogged") || "false"
+  );
   const [trucks, setTrucks] = useState([]);
   const [trips, setTrips] = useState([]);
   const [averageTime, setAverageTime] = useState("");
   const [trucksTripData, setTrucksTripData] = useState();
+  const [loading, setLoading] = useState(true);
 
   const [tripsPerDayData, setTripsPerDayData] = useState();
 
   const [doneInTimeData, setDoneInTimeData] = useState();
+
+  if (isLogged === "false") {
+    window.location.hash = "/login";
+  }
 
   const basicOptions = {
     maintainAspectRatio: false,
@@ -83,6 +92,7 @@ const Statistics = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true);
       let userId = localStorage.getItem("CurrentUserId");
       if (userId) {
         let resultTrucks = await clientService.getTruckAccounts(userId);
@@ -135,17 +145,17 @@ const Statistics = () => {
     }
     // find average timesInSeconds
     var total = 0;
-    console.log(timesInSeconds);
+    // console.log(timesInSeconds);
     for (var j = 0; j < count; j++) {
       total = total + Number(timesInSeconds[j]);
     }
     var avg = Math.round(total / count);
-    console.log("avg secs: " + avg);
+    // console.log("avg secs: " + avg);
     // turn seconds back into a time
     var avgMins = Math.floor(avg / 60);
     var avgSecs = avg - 60 * avgMins;
     var avgHrs = Math.floor(avgMins / 60);
-    console.log("hours: " + avgHrs);
+    // console.log("hours: " + avgHrs);
     avgMins = avgMins - 60 * avgHrs;
     // add leading zeros for seconds, minutes
     avgSecs = ("0" + avgSecs).slice(-2);
@@ -267,8 +277,9 @@ const Statistics = () => {
         },
       ],
     };
-    console.log(doneInTimeChartData);
+
     setDoneInTimeData(doneInTimeChartData);
+    setLoading(false);
   };
 
   const renderStatisticNumber = (data, icon, label) => {
@@ -284,89 +295,107 @@ const Statistics = () => {
 
   return (
     <AppLayout>
-      <div
-        style={{
-          width: "76%",
-          //   minWidth: "760px",
-          display: "inline-block",
-          marginTop: "20px",
-          // marginBottom: "40px",
-        }}
-      >
-        <StyledCard
-          title={<div className="card-title">General shipments info</div>}
+      {loading ? (
+        <div style={{ height: "70vh" }}>
+          <ProgressSpinner
+            style={{
+              position: "fixed",
+              top: "40%",
+              left: "47%",
+            }}
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            width: "76%",
+            //   minWidth: "760px",
+            display: "inline-block",
+            marginTop: "20px",
+            // marginBottom: "40px",
+          }}
         >
-          <div className="grid">
-            <div className="col-9" style={{ paddingBottom: "unset" }}>
-              <div className="grid" style={{ height: "100%" }}>
-                {averageTime && (
-                  <div className="col-12">
+          <StyledCard
+            title={<div className="card-title">General shipments info</div>}
+          >
+            <div className="grid">
+              <div className="col-9" style={{ paddingBottom: "unset" }}>
+                <div className="grid" style={{ height: "100%" }}>
+                  {averageTime && (
+                    <div className="col-12">
+                      {renderStatisticNumber(
+                        averageTime,
+                        <i className="pi pi-clock" />,
+                        "average time"
+                      )}
+                    </div>
+                  )}
+                  <div className="col-6">
                     {renderStatisticNumber(
-                      averageTime,
-                      <i className="pi pi-clock" />,
-                      "average time"
+                      trips.filter((x) => x.isFinished === true).length,
+                      <i className="pi pi-send" />,
+                      "shipments finished"
                     )}
                   </div>
-                )}
-                <div className="col-6">
-                  {renderStatisticNumber(
-                    trips.filter((x) => x.isFinished === true).length,
-                    <i className="pi pi-send" />,
-                    "shipments finished"
-                  )}
-                </div>
-                <div className="col-6">
-                  {renderStatisticNumber(
-                    trucks.length,
-                    <i className="pi pi-car" />,
-                    "trucks assigned"
-                  )}
+                  <div className="col-6">
+                    {renderStatisticNumber(
+                      trucks.length,
+                      <i className="pi pi-car" />,
+                      "trucks assigned"
+                    )}
+                  </div>
                 </div>
               </div>
+              <div className="col-3">
+                {doneInTimeData && (
+                  <>
+                    <StyledStatisticLabel style={{ float: "left" }}>
+                      Un/finished on time:
+                    </StyledStatisticLabel>
+                    <Chart
+                      type="doughnut"
+                      data={doneInTimeData}
+                      options={lightOptions}
+                      style={{
+                        position: "relative",
+                        width: "70%",
+                      }}
+                    />
+                  </>
+                )}
+              </div>
             </div>
-            <div className="col-3">
-              {doneInTimeData && (
-                <>
-                  <StyledStatisticLabel style={{ float: "left" }}>
-                    Un/finished on time:
-                  </StyledStatisticLabel>
-                  <Chart
-                    type="doughnut"
-                    data={doneInTimeData}
-                    options={lightOptions}
-                    style={{
-                      position: "relative",
-                      width: "70%",
-                    }}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        </StyledCard>
-        <StyledCard
-          title={<div className="card-title">Trucks shipments info</div>}
-        >
-          {trucksTripData && (
-            <div>
-              <Chart type="bar" data={trucksTripData} options={basicOptions} />
-            </div>
-          )}
-        </StyledCard>
-        <StyledCard
-          title={<div className="card-title">Number of shipments in time</div>}
-        >
-          {tripsPerDayData && (
-            <div>
-              <Chart
-                type="line"
-                data={tripsPerDayData}
-                options={basicOptions}
-              />
-            </div>
-          )}
-        </StyledCard>
-      </div>
+          </StyledCard>
+          <StyledCard
+            title={<div className="card-title">Trucks shipments info</div>}
+          >
+            {trucksTripData && (
+              <div>
+                <Chart
+                  type="bar"
+                  data={trucksTripData}
+                  options={basicOptions}
+                />
+              </div>
+            )}
+          </StyledCard>
+          <StyledCard
+            title={
+              <div className="card-title">Number of shipments in time</div>
+            }
+          >
+            {tripsPerDayData && (
+              <div>
+                <Chart
+                  type="line"
+                  data={tripsPerDayData}
+                  options={basicOptions}
+                />
+              </div>
+            )}
+          </StyledCard>
+        </div>
+      )}
     </AppLayout>
   );
 };

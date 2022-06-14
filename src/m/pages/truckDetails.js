@@ -16,6 +16,7 @@ import EditTrip from "../journey/EditTip";
 import AppLayout from "../base/Layout";
 import ViewTrip from "../journey/ViewTrip";
 import { Tooltip } from "primereact/tooltip";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const StyledDataTable = styled(DataTable)`
   .p-datatable-header {
@@ -36,6 +37,8 @@ const TruckDetails = () => {
   const [displayAddTrip, setDisplayAddTrip] = useState(false);
   const [displayEditTrip, setDisplayEditTrip] = useState(false);
   const [displayPreviewTrip, setDisplayPreviewTrip] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
   const menu = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -93,16 +96,20 @@ const TruckDetails = () => {
 
   useEffect(() => {
     if (_userid) {
+      setLoading(true);
       clientService.getById(_userid).then((data) => {
         setUser(data);
+        setLoading(false);
       });
       loadTrips();
     }
   }, []); // eslint-disable-line
 
   const loadTrips = () => {
+    setTableLoading(true);
     tripService.getByTruckId(_userid).then((data) => {
       setUserTrips(data);
+      setTableLoading(false);
     });
   };
 
@@ -237,179 +244,197 @@ const TruckDetails = () => {
 
   return (
     <AppLayout>
-      <div
-        style={{
-          width: "76%",
-          // minWidth: "760px",
-          display: "inline-block",
-          marginTop: "20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Card title={user?.plateNumber}>
-          <h4 style={{ textAlign: "left", marginLeft: "10px" }}>
-            Account details
-          </h4>
-          <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-            <div style={{ width: "45%", textAlign: "left" }}>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="id">
-                  Id
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="id">{user?.userId}</span>
-                </div>
-              </div>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="username">
-                  Username
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="username">{user?.userName}</span>
-                </div>
-              </div>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="email">
-                  Email
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="email">{user?.email} </span>
-                </div>
-              </div>
-            </div>
-            <div style={{ width: "45%", textAlign: "left" }}>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="phoneNumber">
-                  Phone number
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="phoneNumber">
-                    {user?.phoneNumber === "" ? "---" : user?.phoneNumber}
-                  </span>
-                </div>
-              </div>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="plateNumber">
-                  Licence plate number
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="plateNumber">
-                    {user?.plateNumber === "" ? "---" : user?.plateNumber}
-                  </span>
-                </div>
-              </div>
-              <div
-                className="p-field p-col-12 p-md-3"
-                style={{ padding: "5px" }}
-              >
-                <label style={{ fontWeight: "bold" }} htmlFor="driversNumber">
-                  Number of drivers
-                </label>
-                <div style={{ marginTop: "2px" }}>
-                  <span id="driversNumber">
-                    {user?.driversNumber ? "---" : user?.driversNumber}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-      <div
-        style={{
-          width: "76%",
-          // minWidth: "760px",
-          display: "inline-block",
-          // marginTop: "20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Card>
-          <StyledDataTable
-            value={userTrips}
-            paginator
-            header={header}
-            filters={filters}
-            globalFilterFields={[
-              "tripId",
-              "country",
-              "region",
-              "city",
-              "street",
-              "moreAddress",
-            ]}
-            rows={4}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            rowsPerPageOptions={[4, 7, 10]}
-            dataKey="id"
-            rowHover
-            responsiveLayout="scroll"
-            emptyMessage="No trips found."
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      {loading ? (
+        <div style={{ height: "70vh" }}>
+          <ProgressSpinner
+            style={{
+              position: "fixed",
+              top: "40%",
+              left: "47%",
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              width: "76%",
+              // minWidth: "760px",
+              display: "inline-block",
+              marginTop: "20px",
+              marginBottom: "20px",
+            }}
           >
-            <Column
-              headerStyle={{ width: "4rem", textAlign: "center" }}
-              bodyStyle={{ textAlign: "center", overflow: "visible" }}
-              body={actionBodyTemplate}
-            />
-            <Column
-              header="Status"
-              sortable
-              sortField="isFinished"
-              bodyStyle={{ textAlign: "center", overflow: "visible" }}
-              style={{ minWidth: "4rem" }}
-              body={statusBodyTemplate}
-            />
-            <Column
-              field="tripId"
-              header="Id"
-              sortable
-              style={{ minWidth: "5rem" }}
-            />
-            <Column
-              field="startDateTime"
-              header="Start date"
-              sortable
-              style={{ minWidth: "10rem" }}
-            />
-            <Column
-              field="endDateTime"
-              header="End date"
-              body={endDateBodyTemplate}
-              sortable
-              style={{ minWidth: "10rem" }}
-            />
-            <Column
-              field="duration"
-              header="Duration"
-              sortable
-              style={{ minWidth: "10rem" }}
-            />
-            <Column
-              field="address"
-              header="Address"
-              body={addressBodyTemplate}
-              sortable
-              style={{ minWidth: "10rem" }}
-            />
-          </StyledDataTable>
-        </Card>
-      </div>
+            <Card title={user?.plateNumber}>
+              <h4 style={{ textAlign: "left", marginLeft: "10px" }}>
+                Account details
+              </h4>
+              <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+                <div style={{ width: "45%", textAlign: "left" }}>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="id">
+                      Id
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="id">{user?.userId}</span>
+                    </div>
+                  </div>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="username">
+                      Username
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="username">{user?.userName}</span>
+                    </div>
+                  </div>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="email">
+                      Email
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="email">{user?.email} </span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ width: "45%", textAlign: "left" }}>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="phoneNumber">
+                      Phone number
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="phoneNumber">
+                        {user?.phoneNumber === "" ? "---" : user?.phoneNumber}
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label style={{ fontWeight: "bold" }} htmlFor="plateNumber">
+                      Licence plate number
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="plateNumber">
+                        {user?.plateNumber === "" ? "---" : user?.plateNumber}
+                      </span>
+                    </div>
+                  </div>
+                  {/* <div
+                    className="p-field p-col-12 p-md-3"
+                    style={{ padding: "5px" }}
+                  >
+                    <label
+                      style={{ fontWeight: "bold" }}
+                      htmlFor="driversNumber"
+                    >
+                      Number of drivers
+                    </label>
+                    <div style={{ marginTop: "2px" }}>
+                      <span id="driversNumber">
+                        {user?.driversNumber ? "---" : user?.driversNumber}
+                      </span>
+                    </div>
+                  </div> */}
+                </div>
+              </div>
+            </Card>
+          </div>
+          <div
+            style={{
+              width: "76%",
+              // minWidth: "760px",
+              display: "inline-block",
+              // marginTop: "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <Card>
+              <StyledDataTable
+                value={userTrips}
+                paginator
+                header={header}
+                filters={filters}
+                globalFilterFields={[
+                  "tripId",
+                  "country",
+                  "region",
+                  "city",
+                  "street",
+                  "moreAddress",
+                ]}
+                rows={4}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                rowsPerPageOptions={[4, 7, 10]}
+                dataKey="id"
+                rowHover
+                responsiveLayout="scroll"
+                emptyMessage="No trips found."
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                loading={tableLoading}
+              >
+                <Column
+                  headerStyle={{ width: "4rem", textAlign: "center" }}
+                  bodyStyle={{ textAlign: "center", overflow: "visible" }}
+                  body={actionBodyTemplate}
+                />
+                <Column
+                  header="Status"
+                  sortable
+                  sortField="isFinished"
+                  bodyStyle={{ textAlign: "center", overflow: "visible" }}
+                  style={{ minWidth: "4rem" }}
+                  body={statusBodyTemplate}
+                />
+                <Column
+                  field="tripId"
+                  header="Id"
+                  sortable
+                  style={{ minWidth: "5rem" }}
+                />
+                <Column
+                  field="startDateTime"
+                  header="Start date"
+                  sortable
+                  style={{ minWidth: "10rem" }}
+                />
+                <Column
+                  field="endDateTime"
+                  header="End date"
+                  body={endDateBodyTemplate}
+                  sortable
+                  style={{ minWidth: "10rem" }}
+                />
+                <Column
+                  field="duration"
+                  header="Duration"
+                  sortable
+                  style={{ minWidth: "10rem" }}
+                />
+                <Column
+                  field="address"
+                  header="Address"
+                  body={addressBodyTemplate}
+                  sortable
+                  style={{ minWidth: "10rem" }}
+                />
+              </StyledDataTable>
+            </Card>
+          </div>
+        </>
+      )}
       <Menu model={items} popup ref={menu} id="popup_menu" />
       <AddTrip
         visible={displayAddTrip}

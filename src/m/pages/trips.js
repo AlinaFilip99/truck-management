@@ -35,6 +35,7 @@ const Trips = () => {
   const [displayAddTrip, setDisplayAddTrip] = useState(false);
   const [displayEditTrip, setDisplayEditTrip] = useState(false);
   const [displayPreviewTrip, setDisplayPreviewTrip] = useState(false);
+  const [loading, setLoading] = useState(true);
   const menu = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -99,10 +100,12 @@ const Trips = () => {
   }, []); // eslint-disable-line
 
   const loadTrips = () => {
+    setLoading(true);
     let userId = localStorage.getItem("CurrentUserId");
     if (userId) {
       tripService.getAll(userId).then((data) => {
         setTrips(data);
+        setLoading(false);
       });
     }
   };
@@ -269,6 +272,7 @@ const Trips = () => {
             responsiveLayout="scroll"
             emptyMessage="No trips found."
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            loading={loading}
           >
             <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}

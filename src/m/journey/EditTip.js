@@ -175,7 +175,6 @@ const EditTrip = ({
   };
 
   const setAddress = (data) => {
-    console.log(data);
     setCountry(data.country || "");
     setRegion(data.region || "");
     setCity(data.locality || "");

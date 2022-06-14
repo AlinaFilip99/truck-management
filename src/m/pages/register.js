@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
@@ -7,6 +7,7 @@ import { Divider } from "primereact/divider";
 import { Button } from "primereact/button";
 import clientService from "../../services/clientService";
 import AppLayout from "../base/Layout";
+import { Toast } from "primereact/toast";
 
 const StyledPassword = styled(Password)`
   width: 100%;
@@ -19,6 +20,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useRef(null);
 
   const header = <h6>Pick a password</h6>;
   const footer = (
@@ -42,12 +44,27 @@ const Register = () => {
       userRole: "Admin",
     });
     if (response.succeeded) {
-      localStorage.setItem("isLogged", "true");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("isAdmin", "true");
-      clientService.getByEmail(email).then((result) => {
-        localStorage.setItem("CurrentUserId", result.userId);
-        window.location.hash = "/trucks";
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Successfully registered!",
+        life: 3000,
+      });
+      setTimeout(() => {
+        localStorage.setItem("isLogged", "true");
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("isAdmin", "true");
+        clientService.getByEmail(email).then((result) => {
+          localStorage.setItem("CurrentUserId", result.userId);
+          window.location.hash = "/trucks";
+        });
+      }, 3000);
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error at register! Please check your informations.",
+        life: 3000,
       });
     }
   };
@@ -110,6 +127,7 @@ const Register = () => {
           </div>
         </Card>
       </div>
+      <Toast ref={toast} />
     </AppLayout>
   );
 };

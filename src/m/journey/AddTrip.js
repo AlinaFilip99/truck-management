@@ -154,7 +154,6 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
   };
 
   const setAddress = (data) => {
-    console.log(data);
     setCountry(data.country || "");
     setRegion(data.region || "");
     setCity(data.locality || "");

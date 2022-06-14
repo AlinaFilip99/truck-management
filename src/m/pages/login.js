@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { Button } from "primereact/button";
 import clientService from "../../services/clientService";
 import AppLayout from "../base/Layout";
+import { Toast } from "primereact/toast";
 
 const StyledPassword = styled(Password)`
   width: 100%;
@@ -23,6 +24,7 @@ const Login = () => {
   if (isLogged === "false") {
     window.location.hash = "/login";
   }
+  const toast = useRef(null);
 
   const LoginUser = async () => {
     let response = await clientService.loginUser({
@@ -31,22 +33,38 @@ const Login = () => {
     });
 
     if (response.succeeded) {
-      let url;
-      localStorage.setItem("isLogged", "true");
-      localStorage.setItem("userEmail", email);
-      let data = await clientService.getUserRoles({ email: email });
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Successfully logged in!",
+        life: 3000,
+      });
 
-      let isAdmin = data.includes("Admin");
-      if (isAdmin) {
-        url = "/trucks";
-      } else {
-        url = "/profile";
-      }
+      setTimeout(async () => {
+        let url;
+        localStorage.setItem("isLogged", "true");
+        localStorage.setItem("userEmail", email);
+        let data = await clientService.getUserRoles({ email: email });
 
-      localStorage.setItem("isAdmin", isAdmin.toString());
-      clientService.getByEmail(email).then((result) => {
-        localStorage.setItem("CurrentUserId", result.userId);
-        window.location.hash = url;
+        let isAdmin = data.includes("Admin");
+        if (isAdmin) {
+          url = "/trucks";
+        } else {
+          url = "/profile";
+        }
+
+        localStorage.setItem("isAdmin", isAdmin.toString());
+        clientService.getByEmail(email).then((result) => {
+          localStorage.setItem("CurrentUserId", result.userId);
+          window.location.hash = url;
+        });
+      }, 3000);
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error at login! Please check your informations.",
+        life: 3000,
       });
     }
   };
@@ -99,6 +117,7 @@ const Login = () => {
           </div>
         </Card>
       </div>
+      <Toast ref={toast} />
     </AppLayout>
   );
 };

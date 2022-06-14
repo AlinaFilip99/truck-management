@@ -30,6 +30,7 @@ const Home = () => {
   const [displayAddUser, setDisplayAddUser] = useState(false);
   const [displayEditUser, setDisplayEditUser] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const menu = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -97,10 +98,12 @@ const Home = () => {
   }, [isLogged]);
 
   const load = () => {
+    setLoading(true);
     let userId = localStorage.getItem("CurrentUserId");
     if (userId) {
       clientService.getTruckAccounts(userId).then((data) => {
         setTruckAccounts(data);
+        setLoading(false);
       });
     }
   };
@@ -199,6 +202,7 @@ const Home = () => {
             responsiveLayout="scroll"
             emptyMessage="No accounts found."
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            loading={loading}
           >
             <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}

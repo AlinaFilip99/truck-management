@@ -31,6 +31,7 @@ const TripsTruck = () => {
   const [trip, setTrip] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [displayPreviewTrip, setDisplayPreviewTrip] = useState(false);
+  const [loading, setLoading] = useState(true);
   const menu = useRef(null);
 
   const [filters, setFilters] = useState({
@@ -51,13 +52,13 @@ const TripsTruck = () => {
         onClick("displayPreviewTrip");
       },
     },
-    {
-      label: "Delete",
-      icon: "pi pi-times",
-      command: () => {
-        confirmDelete();
-      },
-    },
+    // {
+    //   label: "Delete",
+    //   icon: "pi pi-times",
+    //   command: () => {
+    //     confirmDelete();
+    //   },
+    // },
   ];
 
   const confirmDelete = () => {
@@ -86,8 +87,8 @@ const TripsTruck = () => {
   }, []); // eslint-disable-line
 
   const loadTrips = () => {
+    setLoading(true);
     tripService.getByTruckId(_userid).then((data) => {
-      console.log(data);
       let unfinished = data.filter((x) => x.isFinished === false);
       let finished = data.filter((x) => x.isFinished === true);
       let unfinishedActive = unfinished.filter((x) => x.isActive === true);
@@ -97,8 +98,9 @@ const TripsTruck = () => {
         ...unfinishedInactive,
         ...finished,
       ];
-      console.log(orderedData);
+
       setUserTrips(orderedData);
+      setLoading(false);
     });
   };
 
@@ -145,7 +147,7 @@ const TripsTruck = () => {
           <>
             <Button
               className="p-button-rounded p-button-text"
-              icon="pi pi-pause"
+              icon="pi pi-stop"
               onClick={() => endTrip(rowData)}
               tooltip="Active. Click to finish!"
             />
@@ -177,18 +179,19 @@ const TripsTruck = () => {
     }
   };
 
-  const actionBodyTemplate = (rowData) => {
+  const previewBodyTemplate = (rowData) => {
     return (
       <>
         <Button
           className="p-button-rounded p-button-text"
-          icon="pi pi-ellipsis-v"
-          onClick={(event) => {
+          icon="pi pi-eye"
+          onClick={() => {
             setTrip(rowData);
-            menu.current.toggle(event);
+            onClick("displayPreviewTrip");
+            // menu.current.toggle(event);
           }}
-          aria-controls="popup_menu"
-          aria-haspopup
+          // aria-controls="popup_menu"
+          // aria-haspopup
         />
       </>
     );
@@ -284,17 +287,18 @@ const TripsTruck = () => {
             responsiveLayout="scroll"
             emptyMessage="No trips found."
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            loading={loading}
           >
-            {/* <Column
-              headerStyle={{ width: "4rem", textAlign: "center" }}
-              bodyStyle={{ textAlign: "center", overflow: "visible" }}
-              body={previewBodyTemplate}
-            /> */}
             <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}
               bodyStyle={{ textAlign: "center", overflow: "visible" }}
-              body={actionBodyTemplate}
+              body={previewBodyTemplate}
             />
+            {/* <Column
+              headerStyle={{ width: "4rem", textAlign: "center" }}
+              bodyStyle={{ textAlign: "center", overflow: "visible" }}
+              body={actionBodyTemplate}
+            /> */}
             {/* <Column
               headerStyle={{ width: "4rem", textAlign: "center" }}
               bodyStyle={{ textAlign: "center", overflow: "visible" }}
