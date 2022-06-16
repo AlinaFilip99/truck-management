@@ -265,7 +265,7 @@ const AddTrip = ({ visible, onHide, reload, userId, showUsers, users }) => {
             />
           </span>
         </div>
-        {startDate && endDate && (
+        {startDate && duration && (
           <div className="col-4">
             <TripTimeline
               startDate={startDate}
