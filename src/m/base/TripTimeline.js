@@ -34,6 +34,7 @@ const TripTimeline = ({ startDate, duration, setEndTime, setPauses }) => {
             end.getMonth() + 1
           }/${end.getDate()} ${end.getHours()}:${end.getMinutes()}`,
         });
+        setEndTime && setEndTime(end);
         setTripEvents(events);
         return;
       }
