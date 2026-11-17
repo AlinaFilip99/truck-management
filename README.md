@@ -1,70 +1,85 @@
-# Getting Started with Create React App
+# Truck Management
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based fleet and truck management application built to help manage truck accounts, driver or company profiles, trip records, and operational statistics in one place.
 
-## Available Scripts
+## Project Scope
 
-In the project directory, you can run:
+This project focuses on managing the operational side of a trucking business, including:
 
-### `npm start`
+- User registration and login flow
+- Truck account management
+- Fleet overview and detailed truck records
+- Trip tracking and trip history by truck
+- Driver and profile management
+- Business statistics and reporting
+- Contact and informational pages for the service
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The application is designed as a lightweight dashboard for a logistics or transportation company that needs to monitor and organize fleet activity efficiently.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Main Features
 
-### `npm test`
+- Secure authentication flow for users and admins
+- Create, edit, and delete truck-related records
+- View detailed truck information and associated trips
+- Search and filter truck data
+- Track trip activity by truck and user
+- Review summary statistics for performance monitoring
+- Responsive UI for mobile and desktop use
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+- React
+- React Router
+- PrimeReact
+- Styled Components
+- Axios
+- Chart.js
+- Google Maps integration
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Node.js
+- npm
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Run the app
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The application will run in development mode at:
 
-## Learn More
+```text
+http://localhost:3000
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Production build
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run build
+```
 
-### Code Splitting
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```text
+src/
+  m/
+    pages/
+    base/
+  services/
+  assets/
+```
 
-### Analyzing the Bundle Size
+This project follows a page-based structure for the management portal and service logic, centered around trucking operations and user administration.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Notes
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This is a fleet management dashboard intended to support the management of truck resources and operational visibility for a transport business. It is suitable as a front-end management solution and can be extended with backend APIs, database persistence, and more advanced reporting features.

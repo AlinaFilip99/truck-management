@@ -1,4 +1,4 @@
-const API_HOST = "https://localhost:44340";
+const API_HOST = "http://localhost:5000";
 
 const ApiClient = {
   get: (url, params = {}, header = {}) => {
@@ -7,7 +7,7 @@ const ApiClient = {
       "GET",
       params,
       header,
-      false
+      false,
     );
   },
   post: (url, params = {}, header = {}, isMultipart = false) => {
@@ -16,7 +16,7 @@ const ApiClient = {
       "POST",
       params,
       header,
-      isMultipart
+      isMultipart,
     );
   },
   put: (url, params = {}, header = {}) => {
@@ -25,7 +25,7 @@ const ApiClient = {
       "PUT",
       params,
       header,
-      false
+      false,
     );
   },
   delete: (url, params = {}, header = {}) => {
@@ -34,7 +34,7 @@ const ApiClient = {
       "DELETE",
       params,
       header,
-      false
+      false,
     );
   },
   makeRequest: async (
@@ -42,7 +42,7 @@ const ApiClient = {
     type,
     params = {},
     headers = {},
-    isMultipart = false
+    isMultipart = false,
   ) => {
     try {
       type = type.toUpperCase();
